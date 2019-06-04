@@ -13,6 +13,7 @@ public:
   float operator* (Vector2 &oth);
   Vector2 operator* (float oth);
   float GetDistance (Vector2 &oth);
+  float GetDistance2 (Vector2 &oth);
 
   float m_x;
   float m_y;

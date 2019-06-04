@@ -10,9 +10,12 @@ def build(bld):
     module = bld.create_ns3_module('robomaster', ['core', 'wifi'])
     module.source = [
         'model/vector2.cc',
-        'model/ammo.cc',
+        'model/robo-geometry.cc',
+        'model/robo-ammo.cc',
         'model/robo-base.cc',
-        'model/robomaster.cc',
+        'model/robo-hero.cc',
+        'model/robo-shoot.cc',
+        'model/robo-config-common.cc',
 
         'helper/robomaster-helper.cc',
         ]
@@ -26,9 +29,12 @@ def build(bld):
     headers.module = 'robomaster'
     headers.source = [
         'model/vector2.h',
-        'model/ammo.h',
+        'model/robo-geometry.h',
+        'model/robo-ammo.h',
         'model/robo-base.h',
-        'model/robomaster.h',
+        'model/robo-hero.h',
+        'model/robo-shoot.h',
+        'model/robo-config-common.h',
         
         'helper/robomaster-helper.h',
         ]

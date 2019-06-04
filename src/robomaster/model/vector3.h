@@ -13,6 +13,8 @@ public:
   Vector3 operator- (Vector3 &oth);
   Vector3 operator* (Vector3 &oth);
   Vector3 operator* (float oth);
+  float GetDistance (Vector3 &oth);
+  float GetDistance2 (Vector3 &oth);
 
   float m_x;
   float m_y;

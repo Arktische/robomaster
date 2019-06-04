@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "vector2.h"
+#include "math.h"
 
 namespace ns3 {
 Vector2::Vector2 () : m_x (0), m_y (0)
@@ -32,6 +33,12 @@ Vector2 Vector2::operator* (float oth)
 float
 Vector2::GetDistance (Vector2 &oth)
 {
+  return sqrtf ((m_x - oth.m_x) * (m_x - oth.m_x) + (m_y - oth.m_y) * (m_y - oth.m_y));
+}
+float
+Vector2::GetDistance2 (Vector2 &oth)
+{
   return (m_x - oth.m_x) * (m_x - oth.m_x) + (m_y - oth.m_y) * (m_y - oth.m_y);
 }
+
 } // namespace ns3
