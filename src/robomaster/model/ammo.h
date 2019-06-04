@@ -1,7 +1,7 @@
 #pragma once
 #include "ns3/object.h"
 namespace ns3 {
-class Ammo : public : Object
+class Ammo : public Object
 {
 public:
   Ammo ();
@@ -12,7 +12,6 @@ public:
   virtual void AddAmmo(int num);
   virtual bool UseAmmo(int num);
 
-private:
   int m_injury;
   int m_number;
 };

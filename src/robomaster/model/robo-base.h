@@ -4,7 +4,7 @@
 #include "ammo.h"
 
 namespace ns3 {
-class RoboBase : public : Object
+class RoboBase : public Object
 {
 public:
   RoboBase ();

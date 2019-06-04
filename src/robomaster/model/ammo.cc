@@ -1,7 +1,8 @@
+#include "ns3/integer.h"
 #include "ammo.h"
 namespace ns3 {
-OBJECT_ENSURE_REGISTERED (Ammo);
-OBJECT_ENSURE_REGISTERED (LargeAmmo);
+NS_OBJECT_ENSURE_REGISTERED (Ammo);
+NS_OBJECT_ENSURE_REGISTERED (LargeAmmo);
 
 Ammo::Ammo ()
 {
@@ -21,6 +22,7 @@ Ammo::GetTypeId (void)
                          MakeIntegerAccessor (&Ammo::m_injury), MakeIntegerChecker<int> (0))
           .AddAttribute ("Number", "The number of this ammo", IntegerValue (0),
                          MakeIntegerAccessor (&Ammo::m_number), MakeIntegerChecker<int> (0));
+  return tid;
 }
 TypeId
 Ammo::GetInstanceTypeId (void) const
@@ -74,6 +76,7 @@ LargeAmmo::GetTypeId (void)
                          MakeIntegerAccessor (&LargeAmmo::m_injury), MakeIntegerChecker<int> (0))
           .AddAttribute ("Number", "The number of this ammo", IntegerValue (0),
                          MakeIntegerAccessor (&LargeAmmo::m_number), MakeIntegerChecker<int> (0));
+  return tid;
 }
 TypeId
 LargeAmmo::GetInstanceTypeId (void) const
