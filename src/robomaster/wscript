@@ -7,9 +7,13 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('robomaster', ['core'])
+    module = bld.create_ns3_module('robomaster', ['core', 'wifi'])
     module.source = [
+        'model/vector2.cc',
+        'model/ammo.cc',
+        'model/robo-base.cc',
         'model/robomaster.cc',
+
         'helper/robomaster-helper.cc',
         ]
 
@@ -21,7 +25,11 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'robomaster'
     headers.source = [
+        'model/vector2.h',
+        'model/ammo.h',
+        'model/robo-base.h',
         'model/robomaster.h',
+        
         'helper/robomaster-helper.h',
         ]
 
