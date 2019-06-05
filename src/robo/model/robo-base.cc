@@ -18,18 +18,17 @@ RoboBase::~RoboBase ()
 TypeId
 RoboBase::GetTypeId (void)
 {
-  static TypeId tid =
-      TypeId ("ns3::RoboBase")
-          .SetParent<RoboActor> ()
-          .SetGroupName ("Robo")
-          .AddConstructor<RoboBase> ();
-          // .AddAttribute ("Type", "The type of this robot", EnumValue (Follower),
-          //                MakeEnumAccessor (&RoboBase::m_type),
-          //                MakeEnumChecker (Master, "Master", Follower, "Follower"))
-          // .AddAttribute ("Life", "The init life of this robot", IntegerValue (0),
-          //                MakeIntegerAccessor (&RoboBase::m_life), MakeIntegerChecker<int> (0))
-          // .AddAttribute ("MaxSpeed", "The max speed of this robot", DoubleValue (0),
-          //                MakeDoubleAccessor (&RoboBase::m_maxSpeed), MakeDoubleChecker<float> (0));
+  static TypeId tid = TypeId ("ns3::RoboBase")
+                          .SetParent<RoboActor> ()
+                          .SetGroupName ("Robo")
+                          .AddConstructor<RoboBase> ();
+  // .AddAttribute ("Type", "The type of this robot", EnumValue (Follower),
+  //                MakeEnumAccessor (&RoboBase::m_type),
+  //                MakeEnumChecker (Master, "Master", Follower, "Follower"))
+  // .AddAttribute ("Life", "The init life of this robot", IntegerValue (0),
+  //                MakeIntegerAccessor (&RoboBase::m_life), MakeIntegerChecker<int> (0))
+  // .AddAttribute ("MaxSpeed", "The max speed of this robot", DoubleValue (0),
+  //                MakeDoubleAccessor (&RoboBase::m_maxSpeed), MakeDoubleChecker<float> (0));
   return tid;
 }
 TypeId
@@ -155,5 +154,9 @@ void
 RoboBase::SetLife (int life)
 {
   m_life = life;
+}
+void
+RoboBase::IndicateLocation (uint8_t uid)
+{
 }
 } // namespace ns3

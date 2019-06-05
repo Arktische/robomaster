@@ -17,12 +17,15 @@ public:
   ~RoboTeamHelper ();
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
+  virtual void Init();
 
   void AddRobot (std::string roboName, Ptr<RoboActor> robot);
   void GetSmallAmmoNumber (std::string roboName);
   void GetLargeAmmoNumber (std::string roboName);
   void GetRoboLocation (std::string roboName);
   void GetRoboSpeed (std::string roboName);
+
+
 };
 
 

@@ -9,4 +9,12 @@ RoboAmmo::RoboAmmo ()
 RoboAmmo::~RoboAmmo ()
 {
 }
+void RoboAmmo::SetSpeed (FVector speed)
+{
+
+}
+FVector RoboAmmo::GetSpeed () const
+{
+  return FVector();
+}
 } // namespace ns3

@@ -55,5 +55,7 @@ public:
 
   uint8_t AllocUid (void);
   virtual void Update (float delta);
+
+  virtual void IndicateLocation (uint8_t uid);
 };
 } // namespace ns3
