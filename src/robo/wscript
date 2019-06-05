@@ -1,0 +1,54 @@
+# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+# def options(opt):
+#     pass
+
+# def configure(conf):
+#     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
+
+def build(bld):
+    module = bld.create_ns3_module('robo', ['core', 'wifi'])
+    module.source = [
+        'model/fangle2.cc',
+        'model/fvector2.cc',
+        'model/robo-geometry.cc',
+        'model/robo-collision.cc',
+        'model/robo-actor.cc',
+        'model/robo-judge.cc',
+        'model/robo-base.cc',
+        'model/robo-hero.cc',
+        'model/robo-infantry.cc',
+        'model/robo-tower.cc',
+        'model/robo-weapon.cc',
+        'model/robo-ammo.cc',
+        'helper/robo-helper.cc',
+        ]
+
+    module_test = bld.create_ns3_module_test_library('robo')
+    module_test.source = [
+        'test/robo-test-suite.cc',
+        ]
+
+    headers = bld(features='ns3header')
+    headers.module = 'robo'
+    headers.source = [
+        'model/fangle2.h',
+        'model/fvector2.h',
+        'model/robo-geometry.h',
+        'model/robo-collision.h',
+        'model/robo-actor.h',
+        'model/robo-judge.h',
+        'model/robo-base.h',
+        'model/robo-hero.h',
+        'model/robo-infantry.h',
+        'model/robo-tower.h',
+        'model/robo-weapon.h',
+        'model/robo-ammo.h',
+        'helper/robo-helper.h',
+        ]
+
+    if bld.env.ENABLE_EXAMPLES:
+        bld.recurse('examples')
+
+    # bld.ns3_python_bindings()
+
