@@ -21,6 +21,7 @@ def build(bld):
         'model/robo-tower.cc',
         'model/robo-weapon.cc',
         'model/robo-ammo.cc',
+        'model/robo-plot.cc',
         'helper/robo-helper.cc',
         'helper/robo-team-helper.cc',
         ]
@@ -45,6 +46,7 @@ def build(bld):
         'model/robo-tower.h',
         'model/robo-weapon.h',
         'model/robo-ammo.h',
+        'model/robo-plot.h',
         'helper/robo-helper.h',
         'helper/robo-team-helper.h',
         ]
