@@ -16,13 +16,17 @@ RoboJudge::~RoboJudge ()
 TypeId
 RoboJudge::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::RoboJudge")
-                          .SetParent<Object> ()
-                          .SetGroupName ("Robo")
-                          .AddConstructor<RoboJudge> ()
-                          .AddAttribute ("Period", "The period between update", DoubleValue (0.01),
-                                         MakeDoubleAccessor (&RoboJudge::m_updatePeriod),
-                                         MakeDoubleChecker<float> (0));
+  static TypeId tid =
+      TypeId ("ns3::RoboJudge")
+          .SetParent<Object> ()
+          .SetGroupName ("Robo")
+          .AddConstructor<RoboJudge> ()
+          .AddAttribute ("Period", "The period between update", DoubleValue (0.01),
+                         MakeDoubleAccessor (&RoboJudge::m_updatePeriod),
+                         MakeDoubleChecker<float> (0))
+          .AddAttribute ("VisibleDistance", "The visible distance between robos", DoubleValue (5.0),
+                         MakeDoubleAccessor (&RoboJudge::m_visibleDistance),
+                         MakeDoubleChecker<float> (0));
   return tid;
 }
 TypeId

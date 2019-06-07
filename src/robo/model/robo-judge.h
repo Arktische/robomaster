@@ -13,6 +13,7 @@ private:
   std::list<Ptr<RoboActor>> m_largeAmmo;
 
   float m_updatePeriod;
+  float m_visibleDistance;
 
 public:
   RoboJudge ();
