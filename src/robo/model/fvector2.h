@@ -11,6 +11,7 @@ public:
   FVector2 operator+ (FVector2 oth);
   FVector2 operator+= (FVector2 oth);
   FVector2 operator- (FVector2 oth);
+  FVector2 operator- (void);
   FVector2 operator-= (FVector2 oth);
   float operator* (FVector2 oth);
   FVector2 operator* (float oth);

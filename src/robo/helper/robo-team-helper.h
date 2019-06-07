@@ -3,7 +3,7 @@
 
 // #include "ns3/robo.h"
 #include "ns3/core-module.h"
-#include "ns3/node.h"
+#include "ns3/node-container.h"
 #include "ns3/robo-actor.h"
 #include "ns3/robo-base.h"
 #include "ns3/robo-hero.h"
@@ -28,14 +28,18 @@ struct MemberConfig
 };
 typedef std::vector<MemberConfig> TeamConfig;
 
-class RoboTeamHelper
+class RoboTeamHelper : public SimpleRefCount<RoboTeamHelper>
 {
+  friend class RoboHelper;
+
 private:
   std::unordered_map<std::string, Ptr<RoboBase>> m_nameRoboMap;
   std::unordered_map<uint8_t, std::string> m_uidNameMap;
   Ptr<RoboBase> CreateRobot (MemberType type);
   bool m_hasInstalled{false};
   uint8_t m_teamId;
+  NodeContainer m_nodes;
+
   uint8_t AllocateTeamId (void);
 
 public:

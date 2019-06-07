@@ -18,6 +18,8 @@ protected:
   float m_updatePeriod;
   Ptr<RoboJudge> m_judge; //全局裁判
 
+  bool m_isDestroy{false};
+
 private:
   typedef Callback<void, float> UpdateCallback;
   typedef Callback<void, Ptr<RoboActor>> CollisionCallback;
@@ -26,7 +28,6 @@ private:
   std::vector<UpdateCallback> m_updateCallbackList; //每轮更新时调用
   std::vector<UpdateCallback> m_afterUpdateCallbackList; //每轮更新后调用
   std::vector<CollisionCallback> m_collisionCallbackList; //检测到碰撞时调用
-
 
 public:
   RoboActor ();

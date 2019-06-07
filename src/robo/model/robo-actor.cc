@@ -7,6 +7,7 @@ NS_OBJECT_ENSURE_REGISTERED (RoboActor);
 RoboActor::RoboActor ()
 {
   NS_LOG_FUNCTION (this);
+  m_collision = Create<RoboCollision> ();
 }
 
 RoboActor::~RoboActor ()
@@ -46,8 +47,8 @@ void
 RoboActor::BeforeUpdate ()
 {
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
-  //TODO
-  //位置更新
+  FVector oldLocation = m_collision->GetGlobalLocation ();
+  m_collision->SetGlobalLocation (oldLocation + m_speed * m_updatePeriod);
   for (auto &cb : m_beforeUpdateCallbackList)
     {
       cb (m_updatePeriod);
@@ -57,6 +58,7 @@ void
 RoboActor::Update ()
 {
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
+  NS_LOG_INFO(m_collision->GetGlobalLocation ());
   for (auto &cb : m_updateCallbackList)
     {
       cb (m_updatePeriod);

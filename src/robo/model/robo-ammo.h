@@ -15,6 +15,8 @@ public:
   virtual int GetInjury () const;
   virtual void SetRange (float range);
   virtual float GetRange () const;
+
+  virtual void Disable (void);
 };
 
 } // namespace ns3

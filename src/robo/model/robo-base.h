@@ -30,6 +30,7 @@ public:
 
   virtual float GetMaxSpeed (void) const;
 
+  virtual void SetSpeed (FVector speed);
   virtual FVector GetSpeed (void) const;
 
   virtual FVector GetLocation () const;
@@ -57,9 +58,9 @@ protected:
   uint8_t m_team; //所属的队伍
   RoboType m_type; //机器人类型
   float m_maxSpeed; //最大移动速度大小
-  LargeWeapon m_largeAmmo; //大弹药情况
+  Ptr<LargeWeapon> m_largeAmmo; //大弹药情况
   Time m_lastShootLarge; //上次大号弹药射击时刻
-  SmallWeapon m_smallAmmo; //小弹药情况
+  Ptr<SmallWeapon> m_smallAmmo; //小弹药情况
   Time m_lastShootSmall; //上次小号弹药射击时刻
   int m_life; //生命值
 
@@ -67,10 +68,10 @@ protected:
   virtual void SetTeam (uint8_t team);
   virtual void SetType (RoboType type);
   virtual void SetMaxSpeed (float speed);
-  virtual void SetSpeed (FVector speed);
   virtual void SetLocation (FVector location);
   virtual void SetLargeAmmoNumber (int num);
   virtual void SetSmallAmmoNumber (int num);
   virtual void SetLife (int life);
+  virtual void HandleCollision(Ptr<RoboActor> oth);
 };
 } // namespace ns3

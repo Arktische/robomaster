@@ -30,6 +30,11 @@ FVector2::operator- (FVector2 oth)
   return FVector2 (m_x - oth.m_x, m_y - oth.m_y);
 }
 FVector2
+FVector2::operator- (void)
+{
+  return FVector2 (-m_x, -m_y);
+}
+FVector2
 FVector2::operator-= (FVector2 oth)
 {
   m_x -= oth.m_x;

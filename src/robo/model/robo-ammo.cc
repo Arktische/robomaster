@@ -29,4 +29,9 @@ RoboAmmo::GetRange () const
 {
   return m_range;
 }
+void
+RoboAmmo::Disable (void)
+{
+  m_range = -1;
+}
 } // namespace ns3

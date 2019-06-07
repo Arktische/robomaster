@@ -37,6 +37,7 @@ RoboTeamHelper::Install (TeamConfig config)
       NS_ABORT_MSG ("Init a team twice");
     }
   m_hasInstalled = true;
+  m_nodes.Create (config.size ());
   for (unsigned i = 0; i < config.size (); ++i)
     {
       auto &cfg = config[i];
@@ -45,6 +46,7 @@ RoboTeamHelper::Install (TeamConfig config)
       robo->SetTeam (m_teamId);
       m_nameRoboMap.emplace (cfg.m_name, robo);
       m_uidNameMap.emplace (robo->GetUid (), cfg.m_name);
+      m_nodes.Get (i)->AggregateObject (robo);
     }
 }
 Ptr<RoboBase>

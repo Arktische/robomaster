@@ -11,6 +11,9 @@ NS_LOG_COMPONENT_DEFINE ("RoboBase");
 RoboBase::RoboBase ()
 {
   m_uid = AllocUid ();
+  m_largeAmmo = CreateObject<LargeWeapon> ();
+  m_smallAmmo = CreateObject<SmallWeapon> ();
+  AddCollisionCallback (MakeCallback (&RoboBase::HandleCollision, this));
 }
 RoboBase::~RoboBase ()
 {
@@ -111,18 +114,18 @@ RoboBase::SetLocation (FVector location)
 int
 RoboBase::GetLargeAmmoNumber (void) const
 {
-  return m_largeAmmo.m_number;
+  return m_largeAmmo->GetNumber ();
 }
 void
 RoboBase::SetLargeAmmoNumber (int num)
 {
-  m_largeAmmo.m_number = num;
+  m_largeAmmo->SetNumber (num);
 }
 bool
 RoboBase::IsLargeAmmoCanShoot (void) const
 {
-  bool numj = m_largeAmmo.GetNumber () >= 1;
-  bool timj = Simulator::Now () > m_lastShootLarge + m_largeAmmo.GetPeriod ();
+  bool numj = m_largeAmmo->GetNumber () >= 1;
+  bool timj = Simulator::Now () > m_lastShootLarge + m_largeAmmo->GetPeriod ();
   return numj && timj;
 }
 void
@@ -135,10 +138,11 @@ RoboBase::ShootLargeAmmo (FVector speed)
   if (speed.GetLength () <= m_maxSpeed)
     {
       Ptr<RoboAmmo> Ammo = Create<RoboAmmo> ();
-      if (m_largeAmmo.UseAmmo (1))
+      if (m_largeAmmo->UseAmmo (1))
         {
           Ammo->SetSpeed (speed);
           //judgeAddLargeAmmo(Ammo);
+          m_judge->AddLargeAmmo (Ammo);
         }
     }
 }
@@ -146,18 +150,18 @@ RoboBase::ShootLargeAmmo (FVector speed)
 int
 RoboBase::GetSmallAmmoNumber (void) const
 {
-  return m_smallAmmo.m_number;
+  return m_smallAmmo->GetNumber ();
 }
 void
 RoboBase::SetSmallAmmoNumber (int num)
 {
-  m_smallAmmo.m_number = num;
+  m_smallAmmo->SetNumber (num);
 }
 bool
 RoboBase::IsSmallAmmoCanShoot (void) const
 {
-  bool numj = m_smallAmmo.GetNumber () >= 1;
-  bool timj = Simulator::Now () > m_lastShootSmall + m_smallAmmo.GetPeriod ();
+  bool numj = m_smallAmmo->GetNumber () >= 1;
+  bool timj = Simulator::Now () > m_lastShootSmall + m_smallAmmo->GetPeriod ();
   return numj && timj;
 }
 void
@@ -170,10 +174,10 @@ RoboBase::ShootSmallAmmo (FVector speed)
   if (speed.GetLength () <= m_maxSpeed)
     {
       Ptr<RoboAmmo> Ammo = Create<RoboAmmo> ();
-      if (m_smallAmmo.UseAmmo (1))
+      if (m_smallAmmo->UseAmmo (1))
         {
           Ammo->SetSpeed (speed);
-          m_judge->AddLargeAmmo (Ammo);
+          m_judge->AddSmallAmmo (Ammo);
           //AddSmallAmmo(Ammo);
         }
     }
@@ -208,6 +212,30 @@ RoboBase::GetKnownLocation (uint8_t uid)
   else
     {
       return (LocationInfo){255, FVector (), Seconds (0)};
+    }
+}
+
+void
+RoboBase::HandleCollision (Ptr<RoboActor> oth)
+{
+  Ptr<RoboAmmo> ammo = DynamicCast<RoboAmmo> (oth);
+  if (ammo != 0)
+    {
+      if (ammo->GetRange () <= 0)
+        {
+          return;
+        }
+      m_life -= ammo->GetInjury ();
+      ammo->Disable ();
+      return;
+    }
+  Ptr<RoboBase> robo = DynamicCast<RoboBase> (oth);
+  if (robo != 0)
+    {
+      FVector oldLocation = GetLocation ();
+      SetLocation (oldLocation - m_speed * m_updatePeriod);
+      m_speed = -m_speed;
+      return;
     }
 }
 } // namespace ns3
