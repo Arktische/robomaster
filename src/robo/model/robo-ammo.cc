@@ -9,12 +9,24 @@ RoboAmmo::RoboAmmo ()
 RoboAmmo::~RoboAmmo ()
 {
 }
-void RoboAmmo::SetSpeed (FVector speed)
+void
+RoboAmmo::SetInjury (int injury)
 {
-
+  m_injury = injury;
 }
-FVector RoboAmmo::GetSpeed () const
+int
+RoboAmmo::GetInjury () const
 {
-  return FVector();
+  return m_injury;
+}
+void
+RoboAmmo::SetRange (float range)
+{
+  m_range = range;
+}
+float
+RoboAmmo::GetRange () const
+{
+  return m_range;
 }
 } // namespace ns3

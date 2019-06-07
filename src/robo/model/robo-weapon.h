@@ -4,6 +4,8 @@
 namespace ns3 {
 class Weapon : public Object
 {
+  friend class RoboBase;
+
 public:
   Weapon ();
   virtual ~Weapon ();

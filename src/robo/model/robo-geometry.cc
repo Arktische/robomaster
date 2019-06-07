@@ -19,7 +19,8 @@ LineSegment::~LineSegment ()
 bool
 LineSegment::isCross (LineSegment &oth)
 {
-  return 1;
+  return ((((oth.m_start - m_start) * (oth.m_end - m_start)) *
+           ((m_start - oth.m_start) * (m_end - oth.m_start))) > 0);
 }
 bool
 LineSegment::isParallelism (LineSegment &oth)

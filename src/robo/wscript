@@ -22,6 +22,7 @@ def build(bld):
         'model/robo-weapon.cc',
         'model/robo-ammo.cc',
         'helper/robo-helper.cc',
+        'helper/robo-team-helper.cc',
         ]
 
     module_test = bld.create_ns3_module_test_library('robo')
@@ -45,6 +46,7 @@ def build(bld):
         'model/robo-weapon.h',
         'model/robo-ammo.h',
         'helper/robo-helper.h',
+        'helper/robo-team-helper.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:

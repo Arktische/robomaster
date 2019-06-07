@@ -41,6 +41,61 @@ RoboJudge::Update ()
 void
 RoboJudge::DoUpdate ()
 {
-  //TODO
+  // for (auto iter = m_robos.begin (); iter != m_robos.end (); ++iter)
+  //   {
+  //     for (auto subiter = ++iter; subiter != m_robos.end (); ++subiter)
+  //       {
+  //         if (*iter->m_collision->m_globalLocation.GetDistance (
+  //                 *subiter->m_collision->m_globalLocation) < *iter->m_visibleDistance)
+  //           // fix me! : IndicateLocation belong to class RoboBase
+  //           *iter->IndicateLocation (*subiter);
+  //         else if (*subiter->m_collision->m_globalLocation.GetDistance (
+  //                      *iter->m_collision->m_globalLocation) < *subiter->m_visibleDistance)
+  //           *subiter->IndicateLocation (*iter);
+  //         else
+  //           continue;
+  //         if (*iter->m_collision->IsCollision (*subiter->m_collision))
+  //           {
+  //             *iter->IndicateCollision (*subiter);
+  //             *subiter->IndicateCollision (*iter);
+  //           }
+  //       }
+  //     for (auto subiter = m_smallAmmo.begin (); subiter != m_smallAmmo.end (); ++subiter)
+  //       {
+  //         if (*iter->m_collision->IsCollision (*subiter->m_collision))
+  //           {
+  //             *iter->IndicateCollision (*subiter);
+  //             *subiter->IndicateCollision (*iter);
+  //           }
+  //       }
+  //     for (auto subiter = m_largeAmmo.begin (); subiter != m_largeAmmo.end (); ++subiter)
+  //       {
+  //         if (*iter->m_collision->IsCollision (*subiter->m_collision))
+  //           {
+  //             *iter->IndicateCollision (*subiter);
+  //             *subiter->IndicateCollision (*iter);
+  //           }
+  //       }
+  //   }
+}
+void
+RoboJudge::AddRobo (Ptr<RoboActor> actor)
+{
+  m_robos.push_back (actor);
+  return;
+}
+
+void
+RoboJudge::AddSmallAmmo (Ptr<RoboActor> actor)
+{
+  m_smallAmmo.push_back (actor);
+  return;
+}
+
+void
+RoboJudge::AddLargeAmmo (Ptr<RoboActor> actor)
+{
+  m_largeAmmo.push_back (actor);
+  return;
 }
 } // namespace ns3

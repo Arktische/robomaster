@@ -101,48 +101,82 @@ RoboBase::SetSpeed (FVector speed)
 FVector
 RoboBase::GetLocation () const
 {
-  return FVector ();
+  return m_collision->GetGlobalLocation ();
 }
 void
 RoboBase::SetLocation (FVector location)
 {
+  m_collision->SetGlobalLocation (location);
 }
 int
 RoboBase::GetLargeAmmoNumber (void) const
 {
-  return 0;
+  return m_largeAmmo.m_number;
 }
 void
 RoboBase::SetLargeAmmoNumber (int num)
 {
+  m_largeAmmo.m_number = num;
 }
 bool
 RoboBase::IsLargeAmmoCanShoot (void) const
 {
-  return 0;
+  bool numj = m_largeAmmo.GetNumber () >= 1;
+  bool timj = Simulator::Now () > m_lastShootLarge + m_largeAmmo.GetPeriod ();
+  return numj && timj;
 }
 void
 RoboBase::ShootLargeAmmo (FVector speed)
 {
+  if (!IsLargeAmmoCanShoot ())
+    {
+      return;
+    }
+  if (speed.GetLength () <= m_maxSpeed)
+    {
+      Ptr<RoboAmmo> Ammo = Create<RoboAmmo> ();
+      if (m_largeAmmo.UseAmmo (1))
+        {
+          Ammo->SetSpeed (speed);
+          //judgeAddLargeAmmo(Ammo);
+        }
+    }
 }
 
 int
 RoboBase::GetSmallAmmoNumber (void) const
 {
-  return 0;
+  return m_smallAmmo.m_number;
 }
 void
 RoboBase::SetSmallAmmoNumber (int num)
 {
+  m_smallAmmo.m_number = num;
 }
 bool
 RoboBase::IsSmallAmmoCanShoot (void) const
 {
-  return 0;
+  bool numj = m_smallAmmo.GetNumber () >= 1;
+  bool timj = Simulator::Now () > m_lastShootSmall + m_smallAmmo.GetPeriod ();
+  return numj && timj;
 }
 void
 RoboBase::ShootSmallAmmo (FVector speed)
 {
+  if (!IsSmallAmmoCanShoot ())
+    {
+      return;
+    }
+  if (speed.GetLength () <= m_maxSpeed)
+    {
+      Ptr<RoboAmmo> Ammo = Create<RoboAmmo> ();
+      if (m_smallAmmo.UseAmmo (1))
+        {
+          Ammo->SetSpeed (speed);
+          m_judge->AddLargeAmmo (Ammo);
+          //AddSmallAmmo(Ammo);
+        }
+    }
 }
 
 int
@@ -156,7 +190,24 @@ RoboBase::SetLife (int life)
   m_life = life;
 }
 void
-RoboBase::IndicateLocation (uint8_t uid)
+RoboBase::IndicateLocation (Ptr<RoboActor> oth)
 {
+  Ptr<RoboBase> othRobo = DynamicCast<RoboBase> (oth);
+  m_knownLocation[othRobo->GetUid ()] =
+      (LocationInfo){othRobo->GetUid (), othRobo->GetLocation (), Simulator::Now ()};
+}
+
+LocationInfo
+RoboBase::GetKnownLocation (uint8_t uid)
+{
+  auto iter = m_knownLocation.find (uid);
+  if (iter != m_knownLocation.end ())
+    {
+      return iter->second;
+    }
+  else
+    {
+      return (LocationInfo){255, FVector (), Seconds (0)};
+    }
 }
 } // namespace ns3

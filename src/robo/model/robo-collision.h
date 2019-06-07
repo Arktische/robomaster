@@ -17,10 +17,20 @@ public:
   //含参数构造函数及拷贝构造函数
   ~RoboCollision ();
   //Setter & Getter of m_globalLocation m_globalRotation m_collisionMask m_redius
-  //TODO
+  void SetGlobalLocation (FVector globallocation);
+  FVector GetGlobalLocation (void) const;
+
+  void SetGlobalRotation (FAngle globalrotation);
+  FAngle GetGlobalRotation (void) const;
+
+  void SetCollisionMask (uint32_t collisionMask);
+  uint32_t GetCollisionMask (void) const;
+
+  void SetRedius (float redius);
+  float GetRedius (void) const;
 
   //Function Add LineSegment to m_boundary
-  //TODO
+  void AddLineSegment (LineSegment boundary);
 
   //全局-局部坐标变换
   //TODO
