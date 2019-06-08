@@ -14,6 +14,7 @@ struct LocationInfo
 class RoboBase : public RoboActor
 {
   friend class RoboTeamHelper;
+  friend class RoboJudge;
 
 public:
   RoboBase ();

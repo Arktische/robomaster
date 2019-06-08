@@ -53,6 +53,9 @@ protected:
 
   virtual void SetJudge (Ptr<RoboJudge> judge);
   virtual Ptr<RoboJudge> GetJudge (void) const;
+
+  virtual void Disable ();
+  virtual void Enable ();
 };
 
 } // namespace ns3

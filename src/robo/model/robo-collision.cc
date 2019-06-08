@@ -1,12 +1,15 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-collision.h"
 namespace ns3 {
+NS_LOG_COMPONENT_DEFINE ("RoboCollision");
 RoboCollision::RoboCollision ()
 {
+  NS_LOG_FUNCTION (this);
 }
 
 RoboCollision::~RoboCollision ()
 {
+  NS_LOG_FUNCTION (this);
 }
 
 void
@@ -55,14 +58,15 @@ RoboCollision::GetRedius (void) const
 }
 
 void
-RoboCollision::AddLineSegment (LineSegment boundary)
+RoboCollision::AddBoundaryPoint (FVector boundaryPoint)
 {
-  m_boundary.push_back (boundary);
+  m_boundaryPoint.push_back (boundaryPoint);
 }
 
 bool
-RoboCollision::IsCollision (RoboCollision &oth)
+IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
 {
-  return (m_globalLocation.GetDistance (oth.m_globalLocation) <= (m_redius + oth.m_redius));
+  return (obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
+          (obj1->m_redius + obj2->m_redius));
 }
 } // namespace ns3

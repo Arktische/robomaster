@@ -47,8 +47,11 @@ void
 RoboActor::BeforeUpdate ()
 {
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
-  FVector oldLocation = m_collision->GetGlobalLocation ();
-  m_collision->SetGlobalLocation (oldLocation + m_speed * m_updatePeriod);
+  if (!m_isDestroy)
+    {
+      FVector oldLocation = m_collision->GetGlobalLocation ();
+      m_collision->SetGlobalLocation (oldLocation + m_speed * m_updatePeriod);
+    }
   for (auto &cb : m_beforeUpdateCallbackList)
     {
       cb (m_updatePeriod);
@@ -58,10 +61,13 @@ void
 RoboActor::Update ()
 {
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
-  NS_LOG_INFO(m_collision->GetGlobalLocation ());
-  for (auto &cb : m_updateCallbackList)
+  NS_LOG_INFO (m_collision->GetGlobalLocation ());
+  if (!m_isDestroy)
     {
-      cb (m_updatePeriod);
+      for (auto &cb : m_updateCallbackList)
+        {
+          cb (m_updatePeriod);
+        }
     }
   Simulator::Schedule (Seconds (m_updatePeriod) - NanoSeconds (10), &RoboActor::BeforeUpdate, this);
   Simulator::Schedule (Seconds (m_updatePeriod), &RoboActor::Update, this);
@@ -71,9 +77,12 @@ void
 RoboActor::AfterUpdate ()
 {
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
-  for (auto &cb : m_afterUpdateCallbackList)
+  if (!m_isDestroy)
     {
-      cb (m_updatePeriod);
+      for (auto &cb : m_afterUpdateCallbackList)
+        {
+          cb (m_updatePeriod);
+        }
     }
 }
 void
@@ -82,9 +91,12 @@ RoboActor::IndicateCollision (Ptr<RoboActor> oth)
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
   //TODO
   //根据oth类型决定回退上次位置更新(即不能移动的情况)
-  for (auto &cb : m_collisionCallbackList)
+  if (!m_isDestroy)
     {
-      cb (oth); //处理减血等
+      for (auto &cb : m_collisionCallbackList)
+        {
+          cb (oth); //处理减血等
+        }
     }
 }
 
@@ -137,5 +149,18 @@ Ptr<RoboJudge>
 RoboActor::GetJudge (void) const
 {
   return m_judge;
+}
+
+void
+RoboActor::Disable ()
+{
+  NS_LOG_FUNCTION (this);
+  m_isDestroy = true;
+}
+void
+RoboActor::Enable ()
+{
+  NS_LOG_FUNCTION (this);
+  m_isDestroy = false;
 }
 } // namespace ns3

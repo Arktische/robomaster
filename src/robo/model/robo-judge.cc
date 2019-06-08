@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-judge.h"
+#include "robo-base.h"
 namespace ns3 {
 NS_LOG_COMPONENT_DEFINE ("RoboJudge");
 NS_OBJECT_ENSURE_REGISTERED (RoboJudge);
@@ -45,61 +46,55 @@ RoboJudge::Update ()
 void
 RoboJudge::DoUpdate ()
 {
-  // for (auto iter = m_robos.begin (); iter != m_robos.end (); ++iter)
-  //   {
-  //     for (auto subiter = ++iter; subiter != m_robos.end (); ++subiter)
-  //       {
-  //         if (*iter->m_collision->m_globalLocation.GetDistance (
-  //                 *subiter->m_collision->m_globalLocation) < *iter->m_visibleDistance)
-  //           // fix me! : IndicateLocation belong to class RoboBase
-  //           *iter->IndicateLocation (*subiter);
-  //         else if (*subiter->m_collision->m_globalLocation.GetDistance (
-  //                      *iter->m_collision->m_globalLocation) < *subiter->m_visibleDistance)
-  //           *subiter->IndicateLocation (*iter);
-  //         else
-  //           continue;
-  //         if (*iter->m_collision->IsCollision (*subiter->m_collision))
-  //           {
-  //             *iter->IndicateCollision (*subiter);
-  //             *subiter->IndicateCollision (*iter);
-  //           }
-  //       }
-  //     for (auto subiter = m_smallAmmo.begin (); subiter != m_smallAmmo.end (); ++subiter)
-  //       {
-  //         if (*iter->m_collision->IsCollision (*subiter->m_collision))
-  //           {
-  //             *iter->IndicateCollision (*subiter);
-  //             *subiter->IndicateCollision (*iter);
-  //           }
-  //       }
-  //     for (auto subiter = m_largeAmmo.begin (); subiter != m_largeAmmo.end (); ++subiter)
-  //       {
-  //         if (*iter->m_collision->IsCollision (*subiter->m_collision))
-  //           {
-  //             *iter->IndicateCollision (*subiter);
-  //             *subiter->IndicateCollision (*iter);
-  //           }
-  //       }
-  //   }
+  for (uint32_t i = 0; i < m_robos.size (); ++i)
+    {
+      for (uint32_t j = i + 1; j < m_robos.size (); ++j)
+        {
+          if (m_robos[i]->m_collision->m_globalLocation.GetDistance (
+                  m_robos[j]->m_collision->m_globalLocation) < m_visibleDistance)
+            {
+              DynamicCast<RoboBase> (m_robos[i])->IndicateLocation (m_robos[j]);
+              DynamicCast<RoboBase> (m_robos[j])->IndicateLocation (m_robos[i]);
+            }
+          if (IsCollision (m_robos[i]->m_collision, m_robos[j]->m_collision))
+            {
+              m_robos[i]->IndicateCollision (m_robos[j]);
+              m_robos[j]->IndicateCollision (m_robos[i]);
+            }
+        }
+      for (auto j : m_smallAmmo)
+        {
+          if (IsCollision (m_robos[i]->m_collision, j->m_collision))
+            {
+              m_robos[i]->IndicateCollision (j);
+              j->IndicateCollision (m_robos[i]);
+            }
+        }
+      for (auto j : m_largeAmmo)
+        {
+          if (IsCollision (m_robos[i]->m_collision, j->m_collision))
+            {
+              m_robos[i]->IndicateCollision (j);
+              j->IndicateCollision (m_robos[i]);
+            }
+        }
+    }
 }
 void
 RoboJudge::AddRobo (Ptr<RoboActor> actor)
 {
   m_robos.push_back (actor);
-  return;
 }
 
 void
 RoboJudge::AddSmallAmmo (Ptr<RoboActor> actor)
 {
   m_smallAmmo.push_back (actor);
-  return;
 }
 
 void
 RoboJudge::AddLargeAmmo (Ptr<RoboActor> actor)
 {
   m_largeAmmo.push_back (actor);
-  return;
 }
 } // namespace ns3
