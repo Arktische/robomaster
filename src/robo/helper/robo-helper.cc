@@ -6,6 +6,9 @@ namespace ns3 {
 
 RoboHelper::RoboHelper ()
 {
+  m_judge = CreateObject<RoboJudge> ();
+  NS_ASSERT_MSG (m_judge != 0, "Cannot create RoboJudge");
+  m_judge->Initialize();
 }
 
 RoboHelper::~RoboHelper ()
@@ -20,6 +23,7 @@ RoboHelper::Init (TeamConfig config, uint8_t teamNum = 2)
   for (int i = 0; i < teamNum; ++i)
     {
       Ptr<RoboTeamHelper> team = Create<RoboTeamHelper> ();
+      team->SetJudge (m_judge);
       team->Install (config);
       m_teams.push_back (team);
     }

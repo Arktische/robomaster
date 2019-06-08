@@ -44,6 +44,10 @@ RoboTeamHelper::Install (TeamConfig config)
       NS_ASSERT_MSG (m_nameRoboMap.find (cfg.m_name) == m_nameRoboMap.end (), "Name Conflice");
       Ptr<RoboBase> robo = CreateRobot (cfg.m_type);
       robo->SetTeam (m_teamId);
+      robo->SetJudge (m_judge);
+      robo->SetName (cfg.name);
+      //TODO局部坐标转换全局设置初始坐标
+      m_judge->AddRobo (robo);
       m_nameRoboMap.emplace (cfg.m_name, robo);
       m_uidNameMap.emplace (robo->GetUid (), cfg.m_name);
       m_nodes.Get (i)->AggregateObject (robo);
@@ -70,6 +74,12 @@ RoboTeamHelper::AllocateTeamId (void)
 {
   static uint8_t teamId = 0;
   return teamId++;
+}
+
+void
+RoboTeamHelper::SetJudge (Ptr<RoboJudge> judge)
+{
+  m_judge = judge;
 }
 
 } // namespace ns3

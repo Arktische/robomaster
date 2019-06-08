@@ -7,7 +7,6 @@ NS_OBJECT_ENSURE_REGISTERED (RoboJudge);
 RoboJudge::RoboJudge ()
 {
   NS_LOG_FUNCTION (this);
-  Simulator::Schedule (Seconds (m_updatePeriod) - NanoSeconds (5), &RoboJudge::Update, this);
 }
 
 RoboJudge::~RoboJudge ()
@@ -36,6 +35,13 @@ RoboJudge::GetInstanceTypeId (void) const
   NS_LOG_FUNCTION (this);
   return GetTypeId ();
 }
+
+void
+RoboJudge::DoInitialize (void)
+{
+  NS_LOG_FUNCTION (this);
+  Simulator::Schedule (Seconds (m_updatePeriod) - NanoSeconds (5), &RoboJudge::Update, this);
+}
 void
 RoboJudge::Update ()
 {
@@ -46,6 +52,7 @@ RoboJudge::Update ()
 void
 RoboJudge::DoUpdate ()
 {
+  NS_LOG_FUNCTION (this);
   for (uint32_t i = 0; i < m_robos.size (); ++i)
     {
       for (uint32_t j = i + 1; j < m_robos.size (); ++j)
@@ -83,18 +90,21 @@ RoboJudge::DoUpdate ()
 void
 RoboJudge::AddRobo (Ptr<RoboActor> actor)
 {
+  NS_LOG_FUNCTION (this);
   m_robos.push_back (actor);
 }
 
 void
 RoboJudge::AddSmallAmmo (Ptr<RoboActor> actor)
 {
+  NS_LOG_FUNCTION (this);
   m_smallAmmo.push_back (actor);
 }
 
 void
 RoboJudge::AddLargeAmmo (Ptr<RoboActor> actor)
 {
+  NS_LOG_FUNCTION (this);
   m_largeAmmo.push_back (actor);
 }
 } // namespace ns3

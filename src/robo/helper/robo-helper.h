@@ -5,6 +5,7 @@
 #include "ns3/core-module.h"
 #include "ns3/robo-actor.h"
 #include "ns3/robo-team-helper.h"
+#include "ns3/robo-judge.h"
 
 namespace ns3 {
 
@@ -13,6 +14,7 @@ class RoboHelper
 private:
   std::vector<Ptr<RoboTeamHelper>> m_teams;
   bool m_hasInit{false};
+  Ptr<RoboJudge> m_judge;
 
 public:
   RoboHelper ();
