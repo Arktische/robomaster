@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-collision.h"
+const float EPS = 1e-4;
 namespace ns3 {
 NS_LOG_COMPONENT_DEFINE ("RoboCollision");
 RoboCollision::RoboCollision ()
@@ -10,6 +11,17 @@ RoboCollision::RoboCollision ()
 RoboCollision::~RoboCollision ()
 {
   NS_LOG_FUNCTION (this);
+}
+
+void
+RoboCollision::SetType (CollisionType type)
+{
+  m_type = type;
+}
+CollisionType
+RoboCollision::GetType (void) const
+{
+  return m_type;
 }
 
 void
@@ -45,6 +57,17 @@ RoboCollision::GetCollisionMask (void) const
   return m_collisionMask;
 }
 
+uint32_t
+RoboCollision::GetSelfMask (void) const
+{
+  return m_selfMask;
+}
+void
+RoboCollision::SetSelfMask (uint32_t selfMask)
+{
+  m_selfMask = selfMask;
+}
+
 void
 RoboCollision::SetRedius (float redius)
 {
@@ -66,10 +89,160 @@ RoboCollision::AddBoundaryPoint (FVector boundaryPoint)
 bool
 IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
 {
-  if (!(obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
-        (obj1->m_redius + obj2->m_redius)))
+  if (!(obj1->m_selfMask & obj2->m_collisionMask))
     {
       return false;
     }
+  if (!(obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
+        (obj1->m_redius + obj2->m_redius)))
+    {
+      return false; //快速排斥
+    }
+  if (obj1->m_type == Collision_Type_Circle && obj2->m_type == Collision_Type_Circle)
+    {
+      return true;
+    }
+  std::vector<FVector> globalBound1;
+  for (auto &i : obj1->m_boundaryPoint)
+    {
+      globalBound1.push_back (ConvCoordinate (obj1->m_globalLocation, obj1->m_globalRotation, i));
+    }
+  std::vector<FVector> globalBound2;
+  for (auto &i : obj2->m_boundaryPoint)
+    {
+      globalBound2.push_back (ConvCoordinate (obj2->m_globalLocation, obj2->m_globalRotation, i));
+    }
+  auto len1 = globalBound1.size ();
+  auto len2 = globalBound2.size ();
+
+  if (obj1->m_type == Collision_Type_Circle && obj2->m_type == Collision_Type_Polygon)
+    {
+      for (uint32_t i = 1; i < len2; ++i)
+        {
+          if (CircleCrossLineSegment (obj1->m_globalLocation, obj1->m_redius, globalBound2[i - 1],
+                                      globalBound2[i]))
+            {
+              return false;
+            }
+        }
+      if (CircleCrossLineSegment (obj1->m_globalLocation, obj1->m_redius, globalBound2[len2 - 1],
+                                  globalBound2[0]))
+        {
+          return false;
+        }
+      for (uint32_t i = 2; i < len2; ++i)
+        {
+          if (PointInTriangle (obj1->m_globalLocation, globalBound2[0], globalBound2[1],
+                               globalBound2[i]))
+            {
+              return false;
+            }
+        }
+      return true;
+    }
+  if (obj2->m_type == Collision_Type_Circle && obj1->m_type == Collision_Type_Polygon)
+    {
+      for (uint32_t i = 1; i < len1; ++i)
+        {
+          if (CircleCrossLineSegment (obj2->m_globalLocation, obj2->m_redius, globalBound1[i - 1],
+                                      globalBound1[i]))
+            {
+              return false;
+            }
+        }
+      if (CircleCrossLineSegment (obj2->m_globalLocation, obj2->m_redius, globalBound1[len1 - 1],
+                                  globalBound1[0]))
+        {
+          return false;
+        }
+      for (uint32_t i = 2; i < len1; ++i)
+        {
+          if (PointInTriangle (obj2->m_globalLocation, globalBound1[0], globalBound1[1],
+                               globalBound1[i]))
+            {
+              return false;
+            }
+        }
+      return true;
+    }
+
+  if (obj1->m_type == Collision_Type_Polygon && obj2->m_type == Collision_Type_Polygon)
+    {
+      NS_ASSERT_MSG (len1 > 1 && len2 > 1, "Boundary is empty");
+      if (len1 == 2 && len2 == 2)
+        {
+          return IsCross (globalBound1[0], globalBound1[1], globalBound2[0], globalBound2[1]);
+        }
+      if (len1 == 2)
+        {
+          for (uint32_t i = 1; i < len2; ++i)
+            {
+              if (IsCross (globalBound1[0], globalBound1[1], globalBound2[i - 1], globalBound2[i]))
+                {
+                  return false;
+                }
+            }
+          if (IsCross (globalBound1[0], globalBound1[1], globalBound2[len2 - 1], globalBound2[0]))
+            {
+              return false;
+            }
+          for (uint32_t i = 2; i < len2; ++i)
+            {
+              if (PointInTriangle (globalBound1[0], globalBound2[0], globalBound2[1],
+                                   globalBound2[i]))
+                {
+                  return false;
+                }
+            }
+          return true;
+        }
+      if (len2 == 2)
+        {
+          for (uint32_t i = 1; i < len1; ++i)
+            {
+              if (IsCross (globalBound2[0], globalBound2[1], globalBound1[i - 1], globalBound1[i]))
+                {
+                  return false;
+                }
+            }
+          if (IsCross (globalBound2[0], globalBound2[1], globalBound1[len1 - 1], globalBound1[0]))
+            {
+              return false;
+            }
+          for (uint32_t i = 2; i < len1; ++i)
+            {
+              if (PointInTriangle (globalBound2[0], globalBound1[0], globalBound1[1],
+                                   globalBound1[i]))
+                {
+                  return false;
+                }
+            }
+          return true;
+        }
+      for (uint32_t i = 0; i < len1; ++i)
+        {
+          for (uint32_t j = 0; j < len2; ++j)
+            {
+              if (IsCross (globalBound1[i - 1 < 0 ? len1 : i - 1], globalBound1[i],
+                           globalBound2[j - 1 < 0 ? len2 : j - 1], globalBound2[j]))
+                {
+                  return false;
+                }
+            }
+        }
+      for (uint32_t i = 2; i < len1; ++i)
+        {
+          for (uint32_t j = 0; j < len2; ++j)
+            {
+              if (PointInTriangle (globalBound2[j], globalBound1[0], globalBound1[1],
+                                   globalBound1[i]))
+                {
+                  return false;
+                }
+            }
+        }
+      return true;
+    }
+  return false;
 }
 } // namespace ns3

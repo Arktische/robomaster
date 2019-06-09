@@ -4,12 +4,12 @@
 namespace ns3 {
 class RoboTower : public RoboBase
 {
-private:
 public:
   RoboTower ();
   virtual ~RoboTower ();
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
+  virtual void Init();
 };
 
 } // namespace ns3

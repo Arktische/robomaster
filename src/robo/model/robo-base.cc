@@ -249,7 +249,6 @@ void
 RoboBase::SetName (std::string name)
 {
   m_name = name;
-  return;
 }
 
 std::string

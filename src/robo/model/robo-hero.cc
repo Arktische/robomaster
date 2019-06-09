@@ -33,4 +33,9 @@ RoboHero::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
+void
+RoboHero::Init ()
+{
+}
+
 } // namespace ns3

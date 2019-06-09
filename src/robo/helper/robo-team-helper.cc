@@ -82,4 +82,10 @@ RoboTeamHelper::SetJudge (Ptr<RoboJudge> judge)
   m_judge = judge;
 }
 
+void
+RoboTeamHelper::SetInitLocation (FVector location)
+{
+  m_teamInitLocation = location;
+}
+
 } // namespace ns3

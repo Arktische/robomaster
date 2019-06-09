@@ -24,4 +24,5 @@ public:
   float m_x;
   float m_y;
 };
+float Dot (FVector2 v1, FVector2 v2);
 } // namespace ns3

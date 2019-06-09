@@ -62,13 +62,19 @@ FVector2::GetDistance2 (FVector2 oth) const
 float
 FVector2::GetLength (void) const
 {
-  return sqrt (m_x * m_x + m_y * m_y);
+  return sqrtf (m_x * m_x + m_y * m_y);
 }
 std::ostream &
 operator<< (std::ostream &os, const FVector2 &vector)
 {
   os << vector.m_x << ":" << vector.m_y;
   return os;
+}
+
+float
+Dot (FVector2 v1, FVector2 v2)
+{
+  return v1.m_x * v2.m_x + v1.m_y * v2.m_y;
 }
 
 } // namespace ns3

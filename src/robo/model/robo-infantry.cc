@@ -34,4 +34,10 @@ RoboInfantry::GetInstanceTypeId (void) const
   return GetTypeId ();
 }
 
+void
+RoboInfantry::Init ()
+{
+  m_largeAmmo->m_maxNumber = 0;
+}
+
 } // namespace ns3

@@ -45,6 +45,7 @@ private:
   uint8_t m_teamId;
   NodeContainer m_nodes;
   Ptr<RoboJudge> m_judge;
+  FVector m_teamInitLocation;
 
   uint8_t AllocateTeamId (void);
 
@@ -58,6 +59,7 @@ public:
   Ptr<Node> GetNodeByRoboName (std::string roboName);
 
   void SetJudge (Ptr<RoboJudge> judge);
+  void SetInitLocation (FVector location);
 };
 
 } // namespace ns3

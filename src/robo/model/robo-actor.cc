@@ -46,6 +46,10 @@ RoboActor::DoInitialize (void)
 void
 RoboActor::BeforeUpdate ()
 {
+  if (m_isDeleted)
+    {
+      return;
+    }
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
   if (!m_isDestroy)
     {
@@ -60,6 +64,10 @@ RoboActor::BeforeUpdate ()
 void
 RoboActor::Update ()
 {
+  if (m_isDeleted)
+    {
+      return;
+    }
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
   NS_LOG_INFO (m_collision->GetGlobalLocation ());
   if (!m_isDestroy)
@@ -76,6 +84,10 @@ RoboActor::Update ()
 void
 RoboActor::AfterUpdate ()
 {
+  if (m_isDeleted)
+    {
+      return;
+    }
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
   if (!m_isDestroy)
     {
@@ -88,6 +100,10 @@ RoboActor::AfterUpdate ()
 void
 RoboActor::IndicateCollision (Ptr<RoboActor> oth)
 {
+  if (m_isDeleted)
+    {
+      return;
+    }
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
   //TODO
   //根据oth类型决定回退上次位置更新(即不能移动的情况)

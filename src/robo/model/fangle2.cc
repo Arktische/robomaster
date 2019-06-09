@@ -44,6 +44,12 @@ FAngle2::operator- (FAngle2 oth)
 }
 
 FAngle2
+FAngle2::operator- (void)
+{
+  return FAngle2 (-m_phi);
+}
+
+FAngle2
 FAngle2::operator-= (FAngle2 oth)
 {
   m_phi -= oth.m_phi;

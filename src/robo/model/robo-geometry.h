@@ -23,5 +23,8 @@ public:
 
 FVector2 ConvCoordinate (FVector2 centerOfSubcoordinate, FAngle2 directionOfSubcoordinate,
                          FVector2 coordinate);
-
+bool IsCross (FVector2 st1, FVector2 ed1, FVector2 st2, FVector2 ed2);
+bool IsCross (const LineSegment l1, const LineSegment l2);
+bool PointInTriangle (FVector2 point, FVector2 p1, FVector2 p2, FVector2 p3);
+bool CircleCrossLineSegment (FVector2 center, float redius, FVector2 st, FVector2 ed);
 } // namespace ns3

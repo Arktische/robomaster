@@ -15,6 +15,7 @@ public:
   FAngle2 operator+ (FAngle2 oth);
   FAngle2 operator+= (FAngle2 oth);
   FAngle2 operator- (FAngle2 oth);
+  FAngle2 operator- (void);
   FAngle2 operator-= (FAngle2 oth);
 
   //角度转换为弧度

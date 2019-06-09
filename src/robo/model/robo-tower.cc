@@ -32,5 +32,10 @@ RoboTower::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
-
+void
+RoboTower::Init ()
+{
+  m_largeAmmo->m_maxNumber = 0;
+  m_smallAmmo->m_maxNumber = 0;
+}
 } // namespace ns3

@@ -16,6 +16,9 @@ public:
   virtual void SetRange (float range);
   virtual float GetRange () const;
 
+  void UpdateRange(float delta);
+  void HandleCollision(Ptr<RoboActor> oth);
+
   virtual void Disable (void);
 };
 
