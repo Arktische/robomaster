@@ -66,7 +66,10 @@ RoboCollision::AddBoundaryPoint (FVector boundaryPoint)
 bool
 IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
 {
-  return (obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
-          (obj1->m_redius + obj2->m_redius));
+  if (!(obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
+        (obj1->m_redius + obj2->m_redius)))
+    {
+      return false;
+    }
 }
 } // namespace ns3

@@ -19,6 +19,7 @@ protected:
   Ptr<RoboJudge> m_judge; //全局裁判
 
   bool m_isDestroy{false};
+  bool m_isDeleted{false};
 
 private:
   typedef Callback<void, float> UpdateCallback;
@@ -56,6 +57,7 @@ protected:
 
   virtual void Disable ();
   virtual void Enable ();
+  virtual void Delete ();
 };
 
 } // namespace ns3

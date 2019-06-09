@@ -163,4 +163,10 @@ RoboActor::Enable ()
   NS_LOG_FUNCTION (this);
   m_isDestroy = false;
 }
+void
+RoboActor::Delete ()
+{
+  NS_LOG_FUNCTION (this);
+  m_isDeleted = true;
+}
 } // namespace ns3

@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-geometry.h"
+#include <cmath>
 
 namespace ns3 {
 LineSegment::LineSegment (FVector st, FVector ed) : m_start (st), m_end (ed)
@@ -31,5 +32,16 @@ bool
 LineSegment::isVertical (LineSegment &oth)
 {
   return 1;
+}
+
+FVector2
+ConvCoordinate (FVector2 centerOfSubcoordinate, FAngle2 directionOfSubcoordinate,
+                FVector2 coordinate)
+{
+  float cosOfAngle = cosf (directionOfSubcoordinate.m_phi);
+  float sinOfAngle = sinf (directionOfSubcoordinate.m_phi);
+  FVector2 offset (coordinate.m_x * cosOfAngle - coordinate.m_y * sinOfAngle,
+                   coordinate.m_x * sinOfAngle + coordinate.m_y * cosOfAngle);
+  return centerOfSubcoordinate + offset;
 }
 } // namespace ns3

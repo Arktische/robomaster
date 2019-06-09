@@ -5,10 +5,8 @@
 namespace ns3 {
 class FAngle2
 {
-private:
-  float m_phi;
-
 public:
+  float m_phi;
   FAngle2 ();
   FAngle2 (float phi);
   ~FAngle2 ();

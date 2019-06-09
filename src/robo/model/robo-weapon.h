@@ -5,6 +5,7 @@ namespace ns3 {
 class Weapon : public Object
 {
   friend class RoboBase;
+  friend class RoboJudge;
 
 public:
   Weapon ();

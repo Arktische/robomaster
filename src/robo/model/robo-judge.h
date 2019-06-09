@@ -2,6 +2,7 @@
 #pragma once
 #include "ns3/core-module.h"
 #include "robo-actor.h"
+#include <unordered_map>
 
 namespace ns3 {
 class RoboActor;
@@ -34,6 +35,7 @@ public:
   void DoUpdate ();
 
   void TransLargeAmmo (Ptr<RoboActor> from, std::string to, int num);
+  void TransSmallAmmo (Ptr<RoboActor> from, std::string to, int num);
 };
 
 } // namespace ns3

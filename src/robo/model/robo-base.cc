@@ -10,6 +10,7 @@ NS_OBJECT_ENSURE_REGISTERED (RoboBase);
 NS_LOG_COMPONENT_DEFINE ("RoboBase");
 RoboBase::RoboBase ()
 {
+  NS_LOG_FUNCTION (this);
   m_uid = AllocUid ();
   m_largeAmmo = CreateObject<LargeWeapon> ();
   m_smallAmmo = CreateObject<SmallWeapon> ();
@@ -17,6 +18,7 @@ RoboBase::RoboBase ()
 }
 RoboBase::~RoboBase ()
 {
+  NS_LOG_FUNCTION (this);
 }
 TypeId
 RoboBase::GetTypeId (void)
@@ -131,6 +133,7 @@ RoboBase::IsLargeAmmoCanShoot (void) const
 void
 RoboBase::ShootLargeAmmo (FVector speed)
 {
+  NS_LOG_FUNCTION (this);
   if (!IsLargeAmmoCanShoot ())
     {
       return;
@@ -167,6 +170,7 @@ RoboBase::IsSmallAmmoCanShoot (void) const
 void
 RoboBase::ShootSmallAmmo (FVector speed)
 {
+  NS_LOG_FUNCTION (this);
   if (!IsSmallAmmoCanShoot ())
     {
       return;
@@ -196,6 +200,7 @@ RoboBase::SetLife (int life)
 void
 RoboBase::IndicateLocation (Ptr<RoboActor> oth)
 {
+  NS_LOG_FUNCTION (this);
   Ptr<RoboBase> othRobo = DynamicCast<RoboBase> (oth);
   m_knownLocation[othRobo->GetUid ()] =
       (LocationInfo){othRobo->GetUid (), othRobo->GetLocation (), Simulator::Now ()};
@@ -218,6 +223,7 @@ RoboBase::GetKnownLocation (uint8_t uid)
 void
 RoboBase::HandleCollision (Ptr<RoboActor> oth)
 {
+  NS_LOG_FUNCTION (this);
   Ptr<RoboAmmo> ammo = DynamicCast<RoboAmmo> (oth);
   if (ammo != 0)
     {
@@ -237,5 +243,46 @@ RoboBase::HandleCollision (Ptr<RoboActor> oth)
       m_speed = -m_speed;
       return;
     }
+}
+
+void
+RoboBase::SetName (std::string name)
+{
+  m_name = name;
+  return;
+}
+
+std::string
+RoboBase::GetName () const
+{
+  return m_name;
+}
+
+void
+RoboBase::ReceiveLargeAmmo (uint32_t num)
+{
+  NS_LOG_FUNCTION (this);
+  m_largeAmmo->AddAmmo (num);
+}
+
+void
+RoboBase::ReceiveSmallAmmo (uint32_t num)
+{
+  NS_LOG_FUNCTION (this);
+  m_smallAmmo->AddAmmo (num);
+}
+
+void
+RoboBase::GaveLargeAmmoTo (std::string roboName, uint32_t num)
+{
+  NS_LOG_FUNCTION (this);
+  m_judge->TransLargeAmmo (this, roboName, num);
+}
+
+void
+RoboBase::GaveSmallAmmoTo (std::string RoboName, uint32_t num)
+{
+  NS_LOG_FUNCTION (this);
+  m_judge->TransSmallAmmo (this, RoboName, num);
 }
 } // namespace ns3

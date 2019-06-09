@@ -45,7 +45,7 @@ RoboTeamHelper::Install (TeamConfig config)
       Ptr<RoboBase> robo = CreateRobot (cfg.m_type);
       robo->SetTeam (m_teamId);
       robo->SetJudge (m_judge);
-      robo->SetName (cfg.name);
+      robo->SetName (cfg.m_name);
       //TODO局部坐标转换全局设置初始坐标
       m_judge->AddRobo (robo);
       m_nameRoboMap.emplace (cfg.m_name, robo);

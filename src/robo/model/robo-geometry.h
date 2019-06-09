@@ -21,4 +21,7 @@ public:
   bool isVertical (LineSegment &oth);
 };
 
+FVector2 ConvCoordinate (FVector2 centerOfSubcoordinate, FAngle2 directionOfSubcoordinate,
+                         FVector2 coordinate);
+
 } // namespace ns3

@@ -92,6 +92,8 @@ RoboJudge::AddRobo (Ptr<RoboActor> actor)
 {
   NS_LOG_FUNCTION (this);
   m_robos.push_back (actor);
+  m_nameRoboMap.insert(std::pair<std::string, Ptr<RoboActor>>(DynamicCast<RoboBase>(actor)->m_name, actor));
+  return;
 }
 
 void
@@ -106,5 +108,55 @@ RoboJudge::AddLargeAmmo (Ptr<RoboActor> actor)
 {
   NS_LOG_FUNCTION (this);
   m_largeAmmo.push_back (actor);
+}
+
+void
+RoboJudge::TransLargeAmmo(Ptr<RoboActor> from, std::string to, int num)
+{
+  NS_LOG_FUNCTION (this);
+  // Ptr to ammo giver
+  Ptr<RoboBase> giver = DynamicCast<RoboBase>(from);
+  if(giver->m_largeAmmo->GetNumber() < num)
+  {
+    return;
+  }
+  auto iter = m_nameRoboMap.find(to);
+  if(iter == m_nameRoboMap.end())
+  {
+    return;
+  }
+  Ptr<RoboBase> receiver = DynamicCast<RoboBase>(iter->second);
+  if(receiver->m_largeAmmo->GetNumber() + num > receiver->m_largeAmmo->m_maxNumber)
+  {
+    return;
+  }
+  giver->m_largeAmmo->UseAmmo(num);
+  receiver->ReceiveLargeAmmo(num);
+  return;
+}
+
+void
+RoboJudge::TransSmallAmmo(Ptr<RoboActor> from, std::string to, int num)
+{
+  NS_LOG_FUNCTION (this);
+  // Ptr to ammo giver
+  Ptr<RoboBase> giver = DynamicCast<RoboBase>(from);
+  if(giver->m_smallAmmo->GetNumber() < num)
+  {
+    return;
+  }
+  auto iter = m_nameRoboMap.find(to);
+  if(iter == m_nameRoboMap.end())
+  {
+    return;
+  }
+  Ptr<RoboBase> receiver = DynamicCast<RoboBase>(iter->second);
+  if(receiver->m_smallAmmo->GetNumber() + num > receiver->m_smallAmmo->m_maxNumber)
+  {
+    return;
+  }
+  giver->m_smallAmmo->UseAmmo(num);
+  receiver->ReceiveSmallAmmo(num);
+  return;
 }
 } // namespace ns3
