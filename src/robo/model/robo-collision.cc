@@ -92,13 +92,13 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
     {
       return false;
     }
-  puts ("LOG1");
+  NS_LOG_INFO ("Case1");
   if (!(obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
         (obj1->m_redius + obj2->m_redius)))
     {
       return false; //快速排斥
     }
-  puts ("LOG2");
+  NS_LOG_INFO ("Case2");
   if (obj1->m_type == Collision_Type_Circle && obj2->m_type == Collision_Type_Circle)
     {
       return true;
@@ -115,22 +115,22 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
     }
   auto len1 = globalBound1.size ();
   auto len2 = globalBound2.size ();
-  puts ("LOG3");
+  NS_LOG_INFO ("Case4");
   for (auto i : globalBound1)
     {
-      std::cout << i << " ";
+      NS_LOG_INFO (i);
     }
-  puts ("");
+  NS_LOG_INFO ("==============");
   for (auto i : globalBound2)
     {
-      std::cout << i << " ";
+      NS_LOG_INFO (i);
     }
   if (obj1->m_type == Collision_Type_Circle && obj2->m_type == Collision_Type_Polygon)
     {
-      puts ("LOG4");
+      NS_LOG_INFO ("Case5");
       for (uint32_t i = 1; i < len2; ++i)
         {
-          std::cout << i;
+          NS_LOG_INFO (i);
           if (CircleCrossLineSegment (obj1->m_globalLocation, obj1->m_redius, globalBound2[i - 1],
                                       globalBound2[i]))
             {
@@ -142,11 +142,11 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
         {
           return true;
         }
-      puts ("LOG6");
+      NS_LOG_INFO ("Case6");
       for (uint32_t i = 2; i < len2; ++i)
         {
-          std::cout << i;
-          if (PointInTriangle (obj1->m_globalLocation, globalBound2[0], globalBound2[1],
+          NS_LOG_INFO (i);
+          if (PointInTriangle (obj1->m_globalLocation, globalBound2[0], globalBound2[i - 1],
                                globalBound2[i]))
             {
               return true;
@@ -156,7 +156,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
     }
   if (obj2->m_type == Collision_Type_Circle && obj1->m_type == Collision_Type_Polygon)
     {
-      puts ("LOG5");
+      NS_LOG_INFO ("Case7");
       for (uint32_t i = 1; i < len1; ++i)
         {
           if (CircleCrossLineSegment (obj2->m_globalLocation, obj2->m_redius, globalBound1[i - 1],
@@ -172,7 +172,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
         }
       for (uint32_t i = 2; i < len1; ++i)
         {
-          if (PointInTriangle (obj2->m_globalLocation, globalBound1[0], globalBound1[1],
+          if (PointInTriangle (obj2->m_globalLocation, globalBound1[0], globalBound1[i - 1],
                                globalBound1[i]))
             {
               return true;
@@ -203,7 +203,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
             }
           for (uint32_t i = 2; i < len2; ++i)
             {
-              if (PointInTriangle (globalBound1[0], globalBound2[0], globalBound2[1],
+              if (PointInTriangle (globalBound1[0], globalBound2[0], globalBound2[i - 1],
                                    globalBound2[i]))
                 {
                   return true;
@@ -226,7 +226,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
             }
           for (uint32_t i = 2; i < len1; ++i)
             {
-              if (PointInTriangle (globalBound2[0], globalBound1[0], globalBound1[1],
+              if (PointInTriangle (globalBound2[0], globalBound1[0], globalBound1[i - 1],
                                    globalBound1[i]))
                 {
                   return true;
@@ -249,7 +249,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
         {
           for (uint32_t j = 0; j < len2; ++j)
             {
-              if (PointInTriangle (globalBound2[j], globalBound1[0], globalBound1[1],
+              if (PointInTriangle (globalBound2[j], globalBound1[0], globalBound1[i - 1],
                                    globalBound1[i]))
                 {
                   return true;
