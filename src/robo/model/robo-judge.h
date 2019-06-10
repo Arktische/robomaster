@@ -17,14 +17,28 @@ private:
   float m_updatePeriod;
   float m_visibleDistance;
 
+  bool m_enablePlot;
+  float m_plotPeriod;
+  std::string m_plotFileName;
+  FILE *m_filePtr;
+  uint16_t m_bufferSize;
+  unsigned char *m_outputBuffer;
+  unsigned char *m_outputBufferHead;
+  unsigned char *m_outputBufferTail;
+
 public:
   RoboJudge ();
   ~RoboJudge ();
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
   virtual void DoInitialize (void);
+  virtual void DoDispose (void);
 
   void Update ();
+  void PlotAll ();
+  void PlotRobo (Ptr<RoboActor> robo);
+  void PlotLargeAmmo (Ptr<RoboActor> ammo);
+  void PlotSmallAmmo (Ptr<RoboActor> ammo);
 
   void AddRobo (Ptr<RoboActor> actor); //添加robo
   void AddSmallAmmo (Ptr<RoboActor> actor); //添加small ammo
@@ -36,6 +50,8 @@ public:
 
   void TransLargeAmmo (Ptr<RoboActor> from, std::string to, int num);
   void TransSmallAmmo (Ptr<RoboActor> from, std::string to, int num);
+
+  inline void PutChar (unsigned char ch);
 };
 
 } // namespace ns3

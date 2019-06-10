@@ -24,9 +24,16 @@ RoboJudge::GetTypeId (void)
           .AddAttribute ("Period", "The period between update", DoubleValue (0.01),
                          MakeDoubleAccessor (&RoboJudge::m_updatePeriod),
                          MakeDoubleChecker<float> (0))
+          .AddAttribute ("EnablePlot", "Enable plot or not", BooleanValue (true),
+                         MakeBooleanAccessor (&RoboJudge::m_enablePlot), MakeBooleanChecker ())
+          .AddAttribute ("PlotPeriod", "The period between plot", DoubleValue (0.01),
+                         MakeDoubleAccessor (&RoboJudge::m_plotPeriod),
+                         MakeDoubleChecker<float> (0))
           .AddAttribute ("VisibleDistance", "The visible distance between robos", DoubleValue (5.0),
                          MakeDoubleAccessor (&RoboJudge::m_visibleDistance),
-                         MakeDoubleChecker<float> (0));
+                         MakeDoubleChecker<float> (0))
+          .AddAttribute ("PlotFileName", "Plot file name", StringValue ("PlotDefault.plt"),
+                         MakeStringAccessor (&RoboJudge::m_plotFileName), MakeStringChecker ());
   return tid;
 }
 TypeId
@@ -41,6 +48,22 @@ RoboJudge::DoInitialize (void)
 {
   NS_LOG_FUNCTION (this);
   Simulator::Schedule (Seconds (m_updatePeriod) - NanoSeconds (5), &RoboJudge::Update, this);
+  m_filePtr = fopen (m_plotFileName.c_str (), "wb");
+  NS_ASSERT_MSG (m_filePtr != 0, "Cannot create plot file");
+  NS_ASSERT_MSG (m_bufferSize > 0, "Buffer size should larger than zero");
+  m_outputBuffer = new unsigned char[m_bufferSize];
+  NS_ASSERT_MSG (m_outputBuffer != 0, "Cannot allocate memery");
+  m_outputBufferHead = m_outputBuffer;
+  m_outputBufferTail = m_outputBuffer + m_bufferSize;
+}
+
+void
+RoboJudge::DoDispose (void)
+{
+  NS_LOG_FUNCTION (this);
+  fclose (m_filePtr);
+  fwrite (m_outputBuffer, 1, m_outputBufferHead - m_outputBuffer, m_filePtr);
+  delete[] m_outputBuffer;
 }
 void
 RoboJudge::Update ()
@@ -92,8 +115,7 @@ RoboJudge::AddRobo (Ptr<RoboActor> actor)
 {
   NS_LOG_FUNCTION (this);
   m_robos.push_back (actor);
-  m_nameRoboMap.insert(std::pair<std::string, Ptr<RoboActor>>(DynamicCast<RoboBase>(actor)->m_name, actor));
-  return;
+  m_nameRoboMap.emplace (DynamicCast<RoboBase> (actor)->m_name, actor);
 }
 
 void
@@ -111,52 +133,106 @@ RoboJudge::AddLargeAmmo (Ptr<RoboActor> actor)
 }
 
 void
-RoboJudge::TransLargeAmmo(Ptr<RoboActor> from, std::string to, int num)
+RoboJudge::TransLargeAmmo (Ptr<RoboActor> from, std::string to, int num)
 {
   NS_LOG_FUNCTION (this);
   // Ptr to ammo giver
-  Ptr<RoboBase> giver = DynamicCast<RoboBase>(from);
-  if(giver->m_largeAmmo->GetNumber() < num)
-  {
-    return;
-  }
-  auto iter = m_nameRoboMap.find(to);
-  if(iter == m_nameRoboMap.end())
-  {
-    return;
-  }
-  Ptr<RoboBase> receiver = DynamicCast<RoboBase>(iter->second);
-  if(receiver->m_largeAmmo->GetNumber() + num > receiver->m_largeAmmo->m_maxNumber)
-  {
-    return;
-  }
-  giver->m_largeAmmo->UseAmmo(num);
-  receiver->ReceiveLargeAmmo(num);
+  Ptr<RoboBase> giver = DynamicCast<RoboBase> (from);
+  if (giver->m_largeAmmo->GetNumber () < num)
+    {
+      return;
+    }
+  auto iter = m_nameRoboMap.find (to);
+  if (iter == m_nameRoboMap.end ())
+    {
+      return;
+    }
+  Ptr<RoboBase> receiver = DynamicCast<RoboBase> (iter->second);
+  if (receiver->m_largeAmmo->GetNumber () + num > receiver->m_largeAmmo->m_maxNumber)
+    {
+      return;
+    }
+  giver->m_largeAmmo->UseAmmo (num);
+  receiver->ReceiveLargeAmmo (num);
   return;
 }
 
 void
-RoboJudge::TransSmallAmmo(Ptr<RoboActor> from, std::string to, int num)
+RoboJudge::TransSmallAmmo (Ptr<RoboActor> from, std::string to, int num)
 {
   NS_LOG_FUNCTION (this);
   // Ptr to ammo giver
-  Ptr<RoboBase> giver = DynamicCast<RoboBase>(from);
-  if(giver->m_smallAmmo->GetNumber() < num)
-  {
-    return;
-  }
-  auto iter = m_nameRoboMap.find(to);
-  if(iter == m_nameRoboMap.end())
-  {
-    return;
-  }
-  Ptr<RoboBase> receiver = DynamicCast<RoboBase>(iter->second);
-  if(receiver->m_smallAmmo->GetNumber() + num > receiver->m_smallAmmo->m_maxNumber)
-  {
-    return;
-  }
-  giver->m_smallAmmo->UseAmmo(num);
-  receiver->ReceiveSmallAmmo(num);
+  Ptr<RoboBase> giver = DynamicCast<RoboBase> (from);
+  if (giver->m_smallAmmo->GetNumber () < num)
+    {
+      return;
+    }
+  auto iter = m_nameRoboMap.find (to);
+  if (iter == m_nameRoboMap.end ())
+    {
+      return;
+    }
+  Ptr<RoboBase> receiver = DynamicCast<RoboBase> (iter->second);
+  if (receiver->m_smallAmmo->GetNumber () + num > receiver->m_smallAmmo->m_maxNumber)
+    {
+      return;
+    }
+  giver->m_smallAmmo->UseAmmo (num);
+  receiver->ReceiveSmallAmmo (num);
   return;
+}
+
+void
+RoboJudge::PutChar (unsigned char ch)
+{
+  if (m_outputBufferHead == m_outputBufferTail)
+    {
+      fwrite (m_outputBuffer, 1, m_bufferSize, m_filePtr);
+      m_outputBufferHead = m_outputBuffer;
+    }
+  *m_outputBufferHead++ = ch;
+}
+
+void
+RoboJudge::PlotAll ()
+{
+  for (auto &robo : m_robos)
+    {
+      PlotRobo (DynamicCast<RoboBase> (robo));
+    }
+  for (auto &ammo : m_smallAmmo)
+    {
+      if (ammo->m_isDeleted)
+        {
+          continue;
+        }
+      PlotSmallAmmo (ammo);
+    }
+  for (auto &ammo : m_largeAmmo)
+    {
+      if (ammo->m_isDeleted)
+        {
+          continue;
+        }
+      PlotLargeAmmo (ammo);
+    }
+  Simulator::Schedule (Seconds (m_plotPeriod), &RoboJudge::PlotAll, this);
+}
+void
+RoboJudge::PlotRobo (Ptr<RoboActor> robo)
+{
+  auto cast=DynamicCast<RoboBase>(robo);
+  Simulator::Now ().GetSeconds ();
+  cast->m_uid;
+  cast->m_collision->m_globalLocation;
+  cast->m_collision->m_globalRotation;
+}
+void
+RoboJudge::PlotLargeAmmo (Ptr<RoboActor> ammo)
+{
+}
+void
+RoboJudge::PlotSmallAmmo (Ptr<RoboActor> ammo)
+{
 }
 } // namespace ns3

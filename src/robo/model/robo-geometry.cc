@@ -1,4 +1,5 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+#include "ns3/assert.h"
 #include "robo-geometry.h"
 #include <cmath>
 
@@ -15,23 +16,6 @@ LineSegment::LineSegment (float x1, float y1, float x2, float y2)
 }
 LineSegment::~LineSegment ()
 {
-}
-//////////////////TODO////////////////
-bool
-LineSegment::isCross (LineSegment &oth)
-{
-  return ((((oth.m_start - m_start) * (oth.m_end - m_start)) *
-           ((m_start - oth.m_start) * (m_end - oth.m_start))) > 0);
-}
-bool
-LineSegment::isParallelism (LineSegment &oth)
-{
-  return 1;
-}
-bool
-LineSegment::isVertical (LineSegment &oth)
-{
-  return 1;
 }
 
 FVector2
@@ -117,8 +101,12 @@ CircleCrossLineSegment (FVector2 center, float redius, FVector2 st, FVector2 ed)
     {
       return true;
     }
-  float cos1 = Dot (center - st, ed - st) / (center.GetDistance (st) * ed.GetDistance (st));
-  float cos2 = Dot (center - ed, st - ed) / (center.GetDistance (ed) * ed.GetDistance (st));
+  float temp = center.GetDistance (st) * ed.GetDistance (st);
+  NS_ASSERT_MSG (fabsf (temp) > EPS, "center.GetDistance (st) * ed.GetDistance (st), div by 0");
+  float cos1 = Dot (center - st, ed - st) / temp;
+  temp = center.GetDistance (ed) * ed.GetDistance (st);
+  NS_ASSERT_MSG (fabsf (temp) > EPS, "center.GetDistance (ed) * ed.GetDistance (st), div by 0");
+  float cos2 = Dot (center - ed, st - ed) / temp;
 
   if (cos1 <= 0 || cos2 <= 0)
     {

@@ -2,6 +2,8 @@
 #pragma once
 #include "fvector2.h"
 #include "fangle2.h"
+const float EPS = 1e-4;
+
 namespace ns3 {
 typedef FVector2 FVector;
 typedef FAngle2 FAngle;
@@ -15,10 +17,6 @@ public:
   LineSegment (float x1, float y1, float x2, float y2);
   LineSegment (const LineSegment &oth);
   ~LineSegment ();
-
-  bool isCross (LineSegment &oth);
-  bool isParallelism (LineSegment &oth);
-  bool isVertical (LineSegment &oth);
 };
 
 FVector2 ConvCoordinate (FVector2 centerOfSubcoordinate, FAngle2 directionOfSubcoordinate,
