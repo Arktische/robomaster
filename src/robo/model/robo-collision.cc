@@ -83,6 +83,18 @@ void
 RoboCollision::AddBoundaryPoint (FVector boundaryPoint)
 {
   m_boundaryPoint.push_back (boundaryPoint);
+  m_redius = fmax (boundaryPoint.GetLength (), m_redius);
+}
+
+void
+RoboCollision::AddBoundaryPoint (std::vector<FVector> boundaryPoints)
+{
+  for (auto &each : boundaryPoints)
+    {
+      // std::cout << "ADD " << each << "  ";
+      AddBoundaryPoint (each);
+    }
+  // puts ("");
 }
 
 bool
@@ -93,6 +105,8 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
       return false;
     }
   NS_LOG_INFO ("Case1");
+  // std::cout << obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) << "  " << obj1->m_redius
+  //           << "  " << obj2->m_redius << std::endl;
   if (!(obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) <=
         (obj1->m_redius + obj2->m_redius)))
     {
@@ -104,11 +118,13 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
       return true;
     }
   std::vector<FVector> globalBound1;
+  globalBound1.clear ();
   for (auto &i : obj1->m_boundaryPoint)
     {
       globalBound1.push_back (ConvCoordinate (obj1->m_globalLocation, obj1->m_globalRotation, i));
     }
   std::vector<FVector> globalBound2;
+  globalBound2.clear ();
   for (auto &i : obj2->m_boundaryPoint)
     {
       globalBound2.push_back (ConvCoordinate (obj2->m_globalLocation, obj2->m_globalRotation, i));
@@ -183,6 +199,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
 
   if (obj1->m_type == Collision_Type_Polygon && obj2->m_type == Collision_Type_Polygon)
     {
+      NS_LOG_INFO ("Case8");
       NS_ASSERT_MSG (len1 > 1 && len2 > 1, "Boundary is empty");
       if (len1 == 2 && len2 == 2)
         {
@@ -190,6 +207,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
         }
       if (len1 == 2)
         {
+          NS_LOG_INFO ("Case9");
           for (uint32_t i = 1; i < len2; ++i)
             {
               if (IsCross (globalBound1[0], globalBound1[1], globalBound2[i - 1], globalBound2[i]))
@@ -213,6 +231,7 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
         }
       if (len2 == 2)
         {
+          NS_LOG_INFO ("Case10");
           for (uint32_t i = 1; i < len1; ++i)
             {
               if (IsCross (globalBound2[0], globalBound2[1], globalBound1[i - 1], globalBound1[i]))
@@ -234,17 +253,25 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
             }
           return false;
         }
+      NS_LOG_INFO ("Case11");
       for (uint32_t i = 0; i < len1; ++i)
         {
           for (uint32_t j = 0; j < len2; ++j)
             {
-              if (IsCross (globalBound1[(i - 1 < 0 ? len1 : i) - 1], globalBound1[i],
-                           globalBound2[(j - 1 < 0 ? len2 : j) - 1], globalBound2[j]))
+              // std::cout << i << "  " << j << std::endl;
+              // std::cout << (i < 1 ? len1 : i) - 1 << "  " << (j < 1 ? len2 : j) - 1 << std::endl;
+              // std::cout << globalBound1[(i < 1 ? len1 : i) - 1] << "  " << globalBound1[i] << "  "
+              //           << globalBound2[(j < 1 ? len2 : j) - 1] << "  " << globalBound2[j]
+              //           << std::endl;
+              if (IsCross (globalBound1[(i < 1 ? len1 : i) - 1], globalBound1[i],
+                           globalBound2[(j < 1 ? len2 : j) - 1], globalBound2[j]))
                 {
+                  // puts ("TRUE");
                   return true;
                 }
             }
         }
+      NS_LOG_INFO ("Case12");
       for (uint32_t i = 2; i < len1; ++i)
         {
           for (uint32_t j = 0; j < len2; ++j)

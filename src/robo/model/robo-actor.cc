@@ -22,7 +22,7 @@ RoboActor::GetTypeId (void)
           .SetParent<Object> ()
           .SetGroupName ("Robo")
           .AddConstructor<RoboActor> ()
-          .AddAttribute ("Period", "The period between location update", DoubleValue (0.01),
+          .AddAttribute ("Period", "The period between location update", DoubleValue (0.001),
                          MakeDoubleAccessor (&RoboActor::m_updatePeriod),
                          MakeDoubleChecker<float> (0));
   return tid;
@@ -69,7 +69,7 @@ RoboActor::Update ()
       return;
     }
   NS_LOG_FUNCTION (this << static_cast<double> (Simulator::Now ().GetSeconds ()));
-  NS_LOG_INFO (m_collision->GetGlobalLocation ());
+  NS_LOG_INFO (m_collision->GetGlobalLocation ()<<"  "<<m_collision->GetGlobalRotation ());
   if (!m_isDestroy)
     {
       for (auto &cb : m_updateCallbackList)

@@ -1,6 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #pragma once
-#define PI 3.1416f
+#define PI 3.14159265f
 #include <ostream>
 namespace ns3 {
 class FAngle2

@@ -8,7 +8,7 @@ RoboHelper::RoboHelper ()
 {
   m_judge = CreateObject<RoboJudge> ();
   NS_ASSERT_MSG (m_judge != 0, "Cannot create RoboJudge");
-  m_judge->Initialize();
+  m_judge->Initialize ();
 }
 
 RoboHelper::~RoboHelper ()
@@ -16,17 +16,14 @@ RoboHelper::~RoboHelper ()
 }
 
 void
-RoboHelper::Init (TeamConfig config, uint8_t teamNum = 2)
+RoboHelper::AddTeam (TeamConfig config, FVector location, FAngle rotation)
 {
-  NS_ASSERT_MSG (!m_hasInit, "Init Twice");
-  m_hasInit = true;
-  for (int i = 0; i < teamNum; ++i)
-    {
-      Ptr<RoboTeamHelper> team = Create<RoboTeamHelper> ();
-      team->SetJudge (m_judge);
-      team->Install (config);
-      m_teams.push_back (team);
-    }
+  Ptr<RoboTeamHelper> team = Create<RoboTeamHelper> ();
+  team->SetJudge (m_judge);
+  team->SetInitLocation (location);
+  team->SetInitRotation (rotation);
+  team->Install (config);
+  m_teams.push_back (team);
 }
 
 Ptr<RoboTeamHelper>

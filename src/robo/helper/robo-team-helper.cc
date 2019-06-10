@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-team-helper.h"
+#include "ns3/robo-common.h"
 namespace ns3 {
 
 RoboTeamHelper::RoboTeamHelper ()
@@ -47,10 +48,26 @@ RoboTeamHelper::Install (TeamConfig config)
       robo->SetJudge (m_judge);
       robo->SetName (cfg.m_name);
       //TODO局部坐标转换全局设置初始坐标
+      robo->m_collision->m_type = Collision_Type_Polygon;
+      robo->m_collision->m_selfMask = gRoboMask;
+      robo->m_collision->m_collisionMask = gRoboCollisionMask;
+      robo->m_collision->m_globalLocation =
+          ConvCoordinate (m_teamInitLocation, m_teamInitRotation, cfg.m_initLocation);
+      robo->m_collision->m_globalRotation = m_teamInitRotation + cfg.m_initRotation;
+      robo->m_collision->AddBoundaryPoint (cfg.m_boundary);
+      robo->m_speed = FVector ();
+      ////DEBUG
+      if (cfg.m_type == Member_Type_Hero)
+        {
+          robo->SetLargeAmmoNumber (25);
+        }
+      robo->SetSmallAmmoNumber (100);
+      ////DEBUG
       m_judge->AddRobo (robo);
       m_nameRoboMap.emplace (cfg.m_name, robo);
       m_uidNameMap.emplace (robo->GetUid (), cfg.m_name);
       m_nodes.Get (i)->AggregateObject (robo);
+      // std::cout << (int)robo->m_uid << std::endl;
     }
 }
 Ptr<RoboBase>
@@ -88,4 +105,9 @@ RoboTeamHelper::SetInitLocation (FVector location)
   m_teamInitLocation = location;
 }
 
+void
+RoboTeamHelper::SetInitRotation (FAngle rotation)
+{
+  m_teamInitRotation = rotation;
+}
 } // namespace ns3

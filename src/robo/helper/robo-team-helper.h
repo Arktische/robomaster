@@ -21,15 +21,16 @@ enum MemberType {
   Member_Type_AeroRobot, //空中机器人
   Member_Type_Engineer, //工程机器人
   Member_Type_Tower, //基地
-  Member_Type_LargeAmmo,
-  Member_Type_SmallAmmo,
+  // Member_Type_LargeAmmo,
+  // Member_Type_SmallAmmo,
 };
 struct MemberConfig
 {
   MemberType m_type; //类型
   std::string m_name; //名称
   FVector m_initLocation; //初始局部坐标
-  FAngle m_initAngle; //初始局部坐标
+  FAngle m_initRotation; //初始局部坐标
+  std::vector<FVector> m_boundary;
 };
 typedef std::vector<MemberConfig> TeamConfig;
 
@@ -46,6 +47,7 @@ private:
   NodeContainer m_nodes;
   Ptr<RoboJudge> m_judge;
   FVector m_teamInitLocation;
+  FAngle m_teamInitRotation;
 
   uint8_t AllocateTeamId (void);
 
@@ -60,6 +62,7 @@ public:
 
   void SetJudge (Ptr<RoboJudge> judge);
   void SetInitLocation (FVector location);
+  void SetInitRotation (FAngle rotation);
 };
 
 } // namespace ns3

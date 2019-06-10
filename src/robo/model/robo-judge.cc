@@ -21,12 +21,12 @@ RoboJudge::GetTypeId (void)
           .SetParent<Object> ()
           .SetGroupName ("Robo")
           .AddConstructor<RoboJudge> ()
-          .AddAttribute ("Period", "The period between update", DoubleValue (0.01),
+          .AddAttribute ("Period", "The period between update", DoubleValue (0.001),
                          MakeDoubleAccessor (&RoboJudge::m_updatePeriod),
                          MakeDoubleChecker<float> (0))
           .AddAttribute ("EnablePlot", "Enable plot or not", BooleanValue (true),
                          MakeBooleanAccessor (&RoboJudge::m_enablePlot), MakeBooleanChecker ())
-          .AddAttribute ("PlotPeriod", "The period between plot", DoubleValue (0.01),
+          .AddAttribute ("PlotPeriod", "The period between plot", DoubleValue (1.0 / 24),
                          MakeDoubleAccessor (&RoboJudge::m_plotPeriod),
                          MakeDoubleChecker<float> (0))
           .AddAttribute ("VisibleDistance", "The visible distance between robos", DoubleValue (5.0),
@@ -48,6 +48,10 @@ RoboJudge::DoInitialize (void)
 {
   NS_LOG_FUNCTION (this);
   Simulator::Schedule (Seconds (m_updatePeriod) - NanoSeconds (5), &RoboJudge::Update, this);
+  if (m_enablePlot)
+    {
+      Simulator::Schedule (Seconds (m_plotPeriod), &RoboJudge::PlotAll, this);
+    }
   m_filePtr = fopen (m_plotFileName.c_str (), "wb");
   NS_ASSERT_MSG (m_filePtr != 0, "Cannot create plot file");
   NS_ASSERT_MSG (m_bufferSize > 0, "Buffer size should larger than zero");
@@ -76,6 +80,32 @@ void
 RoboJudge::DoUpdate ()
 {
   NS_LOG_FUNCTION (this);
+  auto iter = m_smallAmmo.begin ();
+  while (iter != m_smallAmmo.end ())
+    {
+      if ((*iter)->m_isDeleted)
+        {
+          m_smallAmmo.erase (iter++);
+        }
+      else
+        {
+          iter++;
+        }
+    }
+  iter = m_largeAmmo.begin ();
+  while (iter != m_largeAmmo.end ())
+    {
+      if ((*iter)->m_isDeleted)
+        {
+          m_largeAmmo.erase (iter++);
+        }
+      else
+        {
+          iter++;
+        }
+    }
+  // std::cout << "Ammo " << m_largeAmmo.size () << "  " << m_smallAmmo.size () << std::endl;
+  // std::cout << (int) m_robos.size () << std::endl;
   for (uint32_t i = 0; i < m_robos.size (); ++i)
     {
       for (uint32_t j = i + 1; j < m_robos.size (); ++j)
@@ -88,6 +118,10 @@ RoboJudge::DoUpdate ()
             }
           if (IsCollision (m_robos[i]->m_collision, m_robos[j]->m_collision))
             {
+              std::cout << "  " << (int) DynamicCast<RoboBase> (m_robos[i])->m_team
+                        << DynamicCast<RoboBase> (m_robos[i])->m_name << "  "
+                        << (int) DynamicCast<RoboBase> (m_robos[j])->m_team
+                        << DynamicCast<RoboBase> (m_robos[j])->m_name << std::endl;
               m_robos[i]->IndicateCollision (m_robos[j]);
               m_robos[j]->IndicateCollision (m_robos[i]);
             }
@@ -221,18 +255,25 @@ RoboJudge::PlotAll ()
 void
 RoboJudge::PlotRobo (Ptr<RoboActor> robo)
 {
-  auto cast=DynamicCast<RoboBase>(robo);
-  Simulator::Now ().GetSeconds ();
-  cast->m_uid;
-  cast->m_collision->m_globalLocation;
-  cast->m_collision->m_globalRotation;
+  auto cast = DynamicCast<RoboBase> (robo);
+  // Simulator::Now ().GetSeconds ();
+  // cast->m_uid;
+  // cast->m_collision->m_globalLocation;
+  // cast->m_collision->m_globalRotation;
+  fprintf (m_filePtr, "%.4f$%u$%.4f:%.4f$%.4f\n", Simulator::Now ().GetSeconds (), cast->m_uid,
+           cast->m_collision->m_globalLocation.m_x, cast->m_collision->m_globalLocation.m_y,
+           cast->m_collision->m_globalRotation.m_phi);
 }
 void
 RoboJudge::PlotLargeAmmo (Ptr<RoboActor> ammo)
 {
+  fprintf (m_filePtr, "%.4f&0&%.4f:%.4f\n", Simulator::Now ().GetSeconds (),
+           ammo->m_collision->m_globalLocation.m_x, ammo->m_collision->m_globalLocation.m_y);
 }
 void
 RoboJudge::PlotSmallAmmo (Ptr<RoboActor> ammo)
 {
+  fprintf (m_filePtr, "%.4f&1&%.4f:%.4f\n", Simulator::Now ().GetSeconds (),
+           ammo->m_collision->m_globalLocation.m_x, ammo->m_collision->m_globalLocation.m_y);
 }
 } // namespace ns3

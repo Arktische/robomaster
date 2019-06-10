@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-base.h"
+#include "robo-common.h"
 #include "ns3/integer.h"
 #include "ns3/double.h"
 #include "ns3/enum.h"
@@ -14,6 +15,8 @@ RoboBase::RoboBase ()
   m_uid = AllocUid ();
   m_largeAmmo = CreateObject<LargeWeapon> ();
   m_smallAmmo = CreateObject<SmallWeapon> ();
+  m_lastShootLarge = Seconds (-1);
+  m_lastShootSmall = Seconds (-1);
   AddCollisionCallback (MakeCallback (&RoboBase::HandleCollision, this));
 }
 RoboBase::~RoboBase ()
@@ -126,9 +129,10 @@ RoboBase::SetLargeAmmoNumber (int num)
 bool
 RoboBase::IsLargeAmmoCanShoot (void) const
 {
-  bool numj = m_largeAmmo->GetNumber () >= 1;
-  bool timj = Simulator::Now () > m_lastShootLarge + m_largeAmmo->GetPeriod ();
-  return numj && timj;
+  bool numberJudge = m_largeAmmo->GetNumber () >= 1;
+  bool timeJudge = Simulator::Now () > m_lastShootLarge + m_largeAmmo->GetPeriod ();
+  // std::cout << numberJudge << " & " << timeJudge << std::endl;
+  return numberJudge && timeJudge;
 }
 void
 RoboBase::ShootLargeAmmo (FVector speed)
@@ -138,14 +142,22 @@ RoboBase::ShootLargeAmmo (FVector speed)
     {
       return;
     }
-  if (speed.GetLength () <= m_maxSpeed)
+  if (speed.GetLength () <= m_largeAmmo->GetSpeed ())
     {
-      Ptr<RoboAmmo> Ammo = Create<RoboAmmo> ();
+      // puts ("Speed OK");
+      Ptr<RoboAmmo> Ammo = CreateObject<RoboAmmo> ();
       if (m_largeAmmo->UseAmmo (1))
         {
+          std::cout << "Shoot Ammo at " << m_collision->GetGlobalLocation () << " with speed "
+                    << speed << " and range " << m_largeAmmo->GetRange () << std::endl;
           Ammo->SetSpeed (speed);
-          //judgeAddLargeAmmo(Ammo);
+          Ammo->SetShooterUid (m_uid);
+          Ammo->SetInjury (m_largeAmmo->GetInjury ());
+          Ammo->SetRange (m_largeAmmo->GetRange ());
+          Ammo->SetInitValue (m_collision->GetGlobalLocation (), gLargeAmmoRedius);
+          Ammo->Initialize ();
           m_judge->AddLargeAmmo (Ammo);
+          m_lastShootLarge = Simulator::Now ();
         }
     }
 }
@@ -163,9 +175,9 @@ RoboBase::SetSmallAmmoNumber (int num)
 bool
 RoboBase::IsSmallAmmoCanShoot (void) const
 {
-  bool numj = m_smallAmmo->GetNumber () >= 1;
-  bool timj = Simulator::Now () > m_lastShootSmall + m_smallAmmo->GetPeriod ();
-  return numj && timj;
+  bool numberJudge = m_smallAmmo->GetNumber () >= 1;
+  bool timeJudge = Simulator::Now () > m_lastShootSmall + m_smallAmmo->GetPeriod ();
+  return numberJudge && timeJudge;
 }
 void
 RoboBase::ShootSmallAmmo (FVector speed)
@@ -175,14 +187,19 @@ RoboBase::ShootSmallAmmo (FVector speed)
     {
       return;
     }
-  if (speed.GetLength () <= m_maxSpeed)
+  if (speed.GetLength () <= m_smallAmmo->GetSpeed ())
     {
-      Ptr<RoboAmmo> Ammo = Create<RoboAmmo> ();
+      Ptr<RoboAmmo> Ammo = CreateObject<RoboAmmo> ();
       if (m_smallAmmo->UseAmmo (1))
         {
           Ammo->SetSpeed (speed);
+          Ammo->SetShooterUid (m_uid);
+          Ammo->SetInjury (m_smallAmmo->GetInjury ());
+          Ammo->SetRange (m_smallAmmo->GetRange ());
+          Ammo->SetInitValue (m_collision->GetGlobalLocation (), gSmallAmmoRedius);
+          Ammo->Initialize ();
           m_judge->AddSmallAmmo (Ammo);
-          //AddSmallAmmo(Ammo);
+          m_lastShootSmall = Simulator::Now ();
         }
     }
 }
@@ -224,15 +241,34 @@ void
 RoboBase::HandleCollision (Ptr<RoboActor> oth)
 {
   NS_LOG_FUNCTION (this);
+  // std::cout << "Collision" << m_name << " at " << m_collision->GetGlobalLocation () << std::endl;
   Ptr<RoboAmmo> ammo = DynamicCast<RoboAmmo> (oth);
   if (ammo != 0)
     {
+      // std::cout << (int) m_uid << " Collision Ammo " << (int) ammo->GetShooterUid () << std::endl;
+      if (ammo->GetShooterUid () == m_uid)
+        {
+          return;
+        }
+      // puts ("OK1");
       if (ammo->GetRange () <= 0)
         {
           return;
         }
+      // std::cout << ammo->GetRange () << std::endl;
+      // puts ("OK2");
+      if (m_isDestroy)
+        {
+          return;
+        }
+      // puts ("OK3");
       m_life -= ammo->GetInjury ();
+      if (m_life <= 0)
+        {
+          Disable ();
+        }
       ammo->Disable ();
+      std::cout << "Be shot at " << Simulator::Now ().GetSeconds () << std::endl;
       return;
     }
   Ptr<RoboBase> robo = DynamicCast<RoboBase> (oth);
@@ -241,6 +277,7 @@ RoboBase::HandleCollision (Ptr<RoboActor> oth)
       FVector oldLocation = GetLocation ();
       SetLocation (oldLocation - m_speed * m_updatePeriod);
       m_speed = -m_speed;
+      std::cout << "Collision robot at " << Simulator::Now ().GetSeconds () << std::endl;
       return;
     }
 }

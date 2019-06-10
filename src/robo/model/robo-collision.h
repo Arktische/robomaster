@@ -11,12 +11,13 @@ enum CollisionType {
 class RoboCollision : public SimpleRefCount<RoboCollision>
 {
   friend class RoboJudge;
+  friend class RoboTeamHelper;
 
 private:
   CollisionType m_type{Collision_Type_Circle};
   FVector m_globalLocation; //全局坐标系坐标
   FAngle m_globalRotation; //全局坐标系坐标
-  float m_redius; //包围圆半径
+  float m_redius{0}; //包围圆半径
   std::vector<FVector> m_boundaryPoint; //局部坐标系下边界点
   uint32_t m_collisionMask; //决定是否计算碰撞
   uint32_t m_selfMask; //决定是否计算碰撞
@@ -35,15 +36,17 @@ public:
   FAngle GetGlobalRotation (void) const;
 
   void SetCollisionMask (uint32_t collisionMask);
-  uint32_t GetSelfMask (void) const;
-
-  void SetSelfMask (uint32_t selfMask);
   uint32_t GetCollisionMask (void) const;
+
+  uint32_t GetSelfMask (void) const;
+  void SetSelfMask (uint32_t selfMask);
 
   void SetRedius (float redius);
   float GetRedius (void) const;
 
   void AddBoundaryPoint (FVector boundaryPoint);
+  void AddBoundaryPoint (std::vector<FVector> boundaryPoints);
+
   friend bool IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2);
 };
 

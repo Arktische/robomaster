@@ -13,14 +13,13 @@ class RoboHelper
 {
 private:
   std::vector<Ptr<RoboTeamHelper>> m_teams;
-  bool m_hasInit{false};
   Ptr<RoboJudge> m_judge;
 
 public:
   RoboHelper ();
   ~RoboHelper ();
 
-  void Init (TeamConfig config, uint8_t teamNum);
+  void AddTeam (TeamConfig config, FVector location, FAngle rotation);
   Ptr<RoboTeamHelper> GetTeam (uint8_t teamId);
   NodeContainer GetAllNodes (void);
 
