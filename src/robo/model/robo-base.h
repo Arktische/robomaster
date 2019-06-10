@@ -70,6 +70,8 @@ protected:
   Time m_lastShootSmall; //上次小号弹药射击时刻
   int m_life; //生命值
 
+  Ptr<UniformRandomVariable> m_random;
+
   virtual void SetUid (uint8_t uid);
   virtual void SetTeam (uint8_t team);
   virtual void SetName (std::string name);

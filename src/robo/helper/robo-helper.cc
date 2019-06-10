@@ -26,6 +26,12 @@ RoboHelper::AddTeam (TeamConfig config, FVector location, FAngle rotation)
   m_teams.push_back (team);
 }
 
+void
+RoboHelper::FinishAdd (void)
+{
+  m_judge->FinishAdd ();
+}
+
 Ptr<RoboTeamHelper>
 RoboHelper::GetTeam (uint8_t teamId)
 {

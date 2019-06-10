@@ -20,6 +20,7 @@ public:
   ~RoboHelper ();
 
   void AddTeam (TeamConfig config, FVector location, FAngle rotation);
+  void FinishAdd (void);
   Ptr<RoboTeamHelper> GetTeam (uint8_t teamId);
   NodeContainer GetAllNodes (void);
 

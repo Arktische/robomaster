@@ -4,6 +4,8 @@
 namespace ns3 {
 class RoboAmmo : public RoboActor
 {
+  friend class RoboJudge;
+
 private:
   int m_injury; //伤害值
   float m_range; //有效范围剩余值
@@ -26,7 +28,7 @@ public:
 
   virtual void Disable (void);
 
-  virtual void ShowTrace(float delta);
+  virtual void ShowTrace (float delta);
 };
 
 } // namespace ns3

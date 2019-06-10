@@ -148,8 +148,32 @@ void
 RoboJudge::AddRobo (Ptr<RoboActor> actor)
 {
   NS_LOG_FUNCTION (this);
+  auto cast = DynamicCast<RoboBase> (actor);
   m_robos.push_back (actor);
-  m_nameRoboMap.emplace (DynamicCast<RoboBase> (actor)->m_name, actor);
+  m_nameRoboMap.emplace (cast->m_name, actor);
+  if (m_enablePlot)
+    {
+      fprintf (m_filePtr, "%u$%u$%s$", cast->m_uid, cast->m_team, cast->m_name.c_str ());
+      // for (auto i : cast->m_collision->m_boundaryPoint)
+      for (uint32_t i = 0; i < cast->m_collision->m_boundaryPoint.size () - 1; ++i)
+        {
+          fprintf (m_filePtr, "%.4f:%.4f|", cast->m_collision->m_boundaryPoint[i].m_x,
+                   cast->m_collision->m_boundaryPoint[i].m_y);
+        }
+      fprintf (
+          m_filePtr, "%.4f:%.4f\n",
+          cast->m_collision->m_boundaryPoint[cast->m_collision->m_boundaryPoint.size () - 1].m_x,
+          cast->m_collision->m_boundaryPoint[cast->m_collision->m_boundaryPoint.size () - 1].m_y);
+    }
+}
+
+void
+RoboJudge::FinishAdd (void)
+{
+  if (m_enablePlot)
+    {
+      fprintf (m_filePtr, "##########################\n");
+    }
 }
 
 void
@@ -236,7 +260,7 @@ RoboJudge::PlotAll ()
     }
   for (auto &ammo : m_smallAmmo)
     {
-      if (ammo->m_isDeleted)
+      if (ammo->m_isDeleted || DynamicCast<RoboAmmo> (ammo)->m_range < 0)
         {
           continue;
         }
@@ -244,7 +268,7 @@ RoboJudge::PlotAll ()
     }
   for (auto &ammo : m_largeAmmo)
     {
-      if (ammo->m_isDeleted)
+      if (ammo->m_isDeleted || DynamicCast<RoboAmmo> (ammo)->m_range < 0)
         {
           continue;
         }
@@ -260,9 +284,9 @@ RoboJudge::PlotRobo (Ptr<RoboActor> robo)
   // cast->m_uid;
   // cast->m_collision->m_globalLocation;
   // cast->m_collision->m_globalRotation;
-  fprintf (m_filePtr, "%.4f$%u$%.4f:%.4f$%.4f\n", Simulator::Now ().GetSeconds (), cast->m_uid,
+  fprintf (m_filePtr, "%.4f$%u$%.4f:%.4f$%.4f$%u\n", Simulator::Now ().GetSeconds (), cast->m_uid,
            cast->m_collision->m_globalLocation.m_x, cast->m_collision->m_globalLocation.m_y,
-           cast->m_collision->m_globalRotation.m_phi);
+           cast->m_collision->m_globalRotation.m_phi, cast->m_life);
 }
 void
 RoboJudge::PlotLargeAmmo (Ptr<RoboActor> ammo)

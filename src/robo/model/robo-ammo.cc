@@ -1,5 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 #include "robo-ammo.h"
+#include "robo-base.h"
 #include "robo-common.h"
 
 namespace ns3 {
@@ -70,6 +71,14 @@ RoboAmmo::UpdateRange (float delta)
 void
 RoboAmmo::HandleCollision (Ptr<RoboActor> oth)
 {
+  auto cast = DynamicCast<RoboBase> (oth);
+  if (cast)
+    {
+      if (cast->GetUid () != m_shooterUid)
+        {
+          Disable ();
+        }
+    }
   // Disable ();
 }
 
