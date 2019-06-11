@@ -1,4 +1,23 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2019 HUST Dian Group
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Original Author: Pengyu Liu <eicliupengyu@gmail.com>
+ * Modified by:     Xinyu Li
+ */
 #pragma once
 #include "robo-actor.h"
 #include "robo-weapon.h"
@@ -22,41 +41,41 @@ public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
-  virtual uint8_t GetUid () const;
+  uint8_t GetUid () const;
 
-  virtual uint8_t GetTeam () const;
-  virtual std::string GetName () const;
+  uint8_t GetTeam () const;
+  std::string GetName () const;
 
   enum RoboType { Master, Follower };
-  virtual RoboType GetType () const;
+  RoboType GetType () const;
 
-  virtual float GetMaxSpeed (void) const;
+  float GetMaxSpeed (void) const;
 
-  virtual void SetSpeed (FVector speed);
-  virtual FVector GetSpeed (void) const;
+  void SetSpeed (FVector speed);
+  FVector GetSpeed (void) const;
 
-  virtual FVector GetLocation () const;
+  FVector GetLocation () const;
 
-  virtual int GetLargeAmmoNumber (void) const;
-  virtual bool IsLargeAmmoCanShoot (void) const;
-  virtual void ShootLargeAmmo (FVector speed);
+  int GetLargeAmmoNumber (void) const;
+  bool IsLargeAmmoCanShoot (void) const;
+  void ShootLargeAmmo (FVector speed);
 
-  virtual int GetSmallAmmoNumber (void) const;
-  virtual bool IsSmallAmmoCanShoot (void) const;
-  virtual void ShootSmallAmmo (FVector speed);
+  int GetSmallAmmoNumber (void) const;
+  bool IsSmallAmmoCanShoot (void) const;
+  void ShootSmallAmmo (FVector speed);
 
-  virtual int GetLife () const;
+  int GetLife () const;
 
   uint8_t AllocUid (void);
   virtual void Update (float delta);
 
-  virtual void IndicateLocation (Ptr<RoboActor> oth);
+  void IndicateLocation (Ptr<RoboActor> oth);
 
-  virtual LocationInfo GetKnownLocation (uint8_t uid);
+  LocationInfo GetKnownLocation (uint8_t uid);
   std::map<uint8_t, LocationInfo> m_knownLocation;
 
-  virtual void GaveLargeAmmoTo (std::string roboName, uint32_t num);
-  virtual void GaveSmallAmmoTo (std::string roboName, uint32_t num);
+  void GaveLargeAmmoTo (std::string roboName, uint32_t num);
+  void GaveSmallAmmoTo (std::string roboName, uint32_t num);
 
 protected:
   uint8_t m_uid; //标识符

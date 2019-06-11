@@ -1,6 +1,26 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2019 HUST Dian Group
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Original Author: Pengyu Liu <eicliupengyu@gmail.com>
+ * Modified by:     Yuxing Tu
+ */
 #include "robo-judge.h"
 #include "robo-base.h"
+#include "robo-common.h"
 namespace ns3 {
 NS_LOG_COMPONENT_DEFINE ("RoboJudge");
 NS_OBJECT_ENSURE_REGISTERED (RoboJudge);
@@ -21,6 +41,10 @@ RoboJudge::GetTypeId (void)
           .SetParent<Object> ()
           .SetGroupName ("Robo")
           .AddConstructor<RoboJudge> ()
+          .AddAttribute ("XSize", "X size of boundary", DoubleValue (28),
+                         MakeDoubleAccessor (&RoboJudge::m_boundaryX), MakeDoubleChecker<float> (0))
+          .AddAttribute ("YSize", "Y size of boundary", DoubleValue (15),
+                         MakeDoubleAccessor (&RoboJudge::m_boundaryY), MakeDoubleChecker<float> (0))
           .AddAttribute ("Period", "The period between update", DoubleValue (0.001),
                          MakeDoubleAccessor (&RoboJudge::m_updatePeriod),
                          MakeDoubleChecker<float> (0))
@@ -29,6 +53,9 @@ RoboJudge::GetTypeId (void)
           .AddAttribute ("PlotPeriod", "The period between plot", DoubleValue (1.0 / 24),
                          MakeDoubleAccessor (&RoboJudge::m_plotPeriod),
                          MakeDoubleChecker<float> (0))
+          .AddAttribute ("PlotBufferSize", "Plot buffer size", IntegerValue (65536),
+                         MakeIntegerAccessor (&RoboJudge::m_bufferSize),
+                         MakeIntegerChecker<uint16_t> (0))
           .AddAttribute ("VisibleDistance", "The visible distance between robos", DoubleValue (5.0),
                          MakeDoubleAccessor (&RoboJudge::m_visibleDistance),
                          MakeDoubleChecker<float> (0))
@@ -51,14 +78,25 @@ RoboJudge::DoInitialize (void)
   if (m_enablePlot)
     {
       Simulator::Schedule (Seconds (m_plotPeriod), &RoboJudge::PlotAll, this);
+      m_filePtr = fopen (m_plotFileName.c_str (), "wb");
+      NS_ASSERT_MSG (m_filePtr != 0, "Cannot create plot file");
+      NS_ASSERT_MSG (m_bufferSize > 0, "Buffer size should larger than zero");
+      m_outputBuffer = new unsigned char[m_bufferSize];
+      NS_ASSERT_MSG (m_outputBuffer != 0, "Cannot allocate memery");
+      m_outputBufferHead = m_outputBuffer;
+      m_outputBufferTail = m_outputBuffer + m_bufferSize;
+      fprintf (m_filePtr, "%.4f:%.4f\n", m_boundaryX, m_boundaryY);
     }
-  m_filePtr = fopen (m_plotFileName.c_str (), "wb");
-  NS_ASSERT_MSG (m_filePtr != 0, "Cannot create plot file");
-  NS_ASSERT_MSG (m_bufferSize > 0, "Buffer size should larger than zero");
-  m_outputBuffer = new unsigned char[m_bufferSize];
-  NS_ASSERT_MSG (m_outputBuffer != 0, "Cannot allocate memery");
-  m_outputBufferHead = m_outputBuffer;
-  m_outputBufferTail = m_outputBuffer + m_bufferSize;
+
+  Ptr<RoboCollision> boundary = Create<RoboCollision> ();
+  boundary->SetType (Collision_Type_Boundary);
+  boundary->SetSelfMask (gBoundaryMask);
+  boundary->SetCollisionMask (gBoundaryCollisionMask);
+  boundary->SetGlobalLocation (FVector ());
+  boundary->SetGlobalRotation (FAngle ());
+  boundary->AddBoundaryPoint (FVector (0, 0));
+  boundary->AddBoundaryPoint (FVector (m_boundaryX, m_boundaryY));
+  AddCollision (boundary);
 }
 
 void
@@ -80,6 +118,31 @@ void
 RoboJudge::DoUpdate ()
 {
   NS_LOG_FUNCTION (this);
+  for (auto &i : m_othCollision)
+    {
+      for (auto &j : m_robos)
+        {
+          if (IsCollision (i->m_collision, j->m_collision))
+            {
+              puts ("Collision");
+              j->IndicateCollision (i);
+            }
+        }
+      for (auto &j : m_smallAmmo)
+        {
+          if (IsCollision (i->m_collision, j->m_collision))
+            {
+              j->Delete ();
+            }
+        }
+      for (auto &j : m_largeAmmo)
+        {
+          if (IsCollision (i->m_collision, j->m_collision))
+            {
+              j->Delete ();
+            }
+        }
+    }
   auto iter = m_smallAmmo.begin ();
   while (iter != m_smallAmmo.end ())
     {
@@ -106,6 +169,7 @@ RoboJudge::DoUpdate ()
     }
   // std::cout << "Ammo " << m_largeAmmo.size () << "  " << m_smallAmmo.size () << std::endl;
   // std::cout << (int) m_robos.size () << std::endl;
+
   for (uint32_t i = 0; i < m_robos.size (); ++i)
     {
       for (uint32_t j = i + 1; j < m_robos.size (); ++j)
@@ -165,6 +229,13 @@ RoboJudge::AddRobo (Ptr<RoboActor> actor)
           cast->m_collision->m_boundaryPoint[cast->m_collision->m_boundaryPoint.size () - 1].m_x,
           cast->m_collision->m_boundaryPoint[cast->m_collision->m_boundaryPoint.size () - 1].m_y);
     }
+}
+void
+RoboJudge::AddCollision (Ptr<RoboCollision> col)
+{
+  Ptr<RoboActor> actor = CreateObject<RoboActor> ();
+  actor->m_collision = col;
+  m_othCollision.push_back (actor);
 }
 
 void

@@ -1,4 +1,23 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2019 HUST Dian Group
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Original Author: Pengyu Liu <eicliupengyu@gmail.com>
+ * Modified by:     Zhichao Liu
+ */
 #include "robo-collision.h"
 namespace ns3 {
 NS_LOG_COMPONENT_DEFINE ("RoboCollision");
@@ -100,9 +119,27 @@ RoboCollision::AddBoundaryPoint (std::vector<FVector> boundaryPoints)
 bool
 IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
 {
+  // if(Simulator::Now().GetSeconds()>14&&Simulator::Now().GetSeconds()<18)
+  // std::cout<<Simulator::Now().GetSeconds()<<"  "<<obj1->m_selfMask<<"  "<<obj2->m_selfMask<<std::endl;
   if (!(obj1->m_selfMask & obj2->m_collisionMask))
     {
       return false;
+    }
+  if (obj1->m_type == Collision_Type_Boundary)
+    {
+      // if(Simulator::Now().GetSeconds()>14&&Simulator::Now().GetSeconds()<18)
+      // std::cout<<Simulator::Now().GetSeconds()<<"   "<<obj1->m_boundaryPoint[0]<<"   "<<obj1->m_boundaryPoint[1]<<"  "<<obj2->m_globalLocation<<std::endl;
+      return !(obj2->m_globalLocation.m_x > obj1->m_boundaryPoint[0].m_x &&
+              obj2->m_globalLocation.m_y > obj1->m_boundaryPoint[0].m_y &&
+              obj2->m_globalLocation.m_x < obj1->m_boundaryPoint[1].m_x &&
+              obj2->m_globalLocation.m_y < obj1->m_boundaryPoint[1].m_y);
+    }
+  if (obj2->m_type == Collision_Type_Boundary)
+    {
+      return !(obj1->m_globalLocation.m_x > obj2->m_boundaryPoint[0].m_x &&
+              obj1->m_globalLocation.m_y > obj2->m_boundaryPoint[0].m_y &&
+              obj1->m_globalLocation.m_x < obj2->m_boundaryPoint[1].m_x &&
+              obj1->m_globalLocation.m_y < obj2->m_boundaryPoint[1].m_y);
     }
   NS_LOG_INFO ("Case1");
   // std::cout << obj1->m_globalLocation.GetDistance (obj2->m_globalLocation) << "  " << obj1->m_redius
@@ -284,20 +321,6 @@ IsCollision (Ptr<RoboCollision> obj1, Ptr<RoboCollision> obj2)
             }
         }
       return false;
-    }
-  if (obj1->m_type == Collision_Type_Boundary)
-    {
-      return (obj2->m_globalLocation.m_x > globalBound1[0].m_x &&
-              obj2->m_globalLocation.m_y > globalBound1[0].m_y &&
-              obj2->m_globalLocation.m_x < globalBound1[1].m_x &&
-              obj2->m_globalLocation.m_y < globalBound1[1].m_y);
-    }
-  if (obj2->m_type == Collision_Type_Boundary)
-    {
-      return (obj1->m_globalLocation.m_x > globalBound2[0].m_x &&
-              obj1->m_globalLocation.m_y > globalBound2[0].m_y &&
-              obj1->m_globalLocation.m_x < globalBound2[1].m_x &&
-              obj1->m_globalLocation.m_y < globalBound2[1].m_y);
     }
   return false;
 }

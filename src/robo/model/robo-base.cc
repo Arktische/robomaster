@@ -1,4 +1,23 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * Copyright (c) 2019 HUST Dian Group
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Original Author: Pengyu Liu <eicliupengyu@gmail.com>
+ * Modified by:     Xinyu Li
+ */
 #include "robo-base.h"
 #include "robo-common.h"
 #include "ns3/integer.h"
@@ -136,7 +155,7 @@ RoboBase::IsLargeAmmoCanShoot (void) const
   bool numberJudge = m_largeAmmo->GetNumber () >= 1;
   bool timeJudge = Simulator::Now () > m_lastShootLarge + m_largeAmmo->GetPeriod ();
   // std::cout << numberJudge << " & " << timeJudge << std::endl;
-  return numberJudge && timeJudge;
+  return numberJudge && timeJudge && !m_isDestroy;
 }
 void
 RoboBase::ShootLargeAmmo (FVector speed)
@@ -182,7 +201,7 @@ RoboBase::IsSmallAmmoCanShoot (void) const
 {
   bool numberJudge = m_smallAmmo->GetNumber () >= 1;
   bool timeJudge = Simulator::Now () > m_lastShootSmall + m_smallAmmo->GetPeriod ();
-  return numberJudge && timeJudge;
+  return numberJudge && timeJudge && !m_isDestroy;
 }
 void
 RoboBase::ShootSmallAmmo (FVector speed)
@@ -224,6 +243,10 @@ void
 RoboBase::IndicateLocation (Ptr<RoboActor> oth)
 {
   NS_LOG_FUNCTION (this);
+  if (m_isDestroy)
+    {
+      return;
+    }
   Ptr<RoboBase> othRobo = DynamicCast<RoboBase> (oth);
   m_knownLocation[othRobo->GetUid ()] =
       (LocationInfo){othRobo->GetUid (), othRobo->GetLocation (), Simulator::Now ()};
@@ -247,6 +270,14 @@ void
 RoboBase::HandleCollision (Ptr<RoboActor> oth)
 {
   NS_LOG_FUNCTION (this);
+  if (oth->m_collision->GetType () == Collision_Type_Boundary)
+    {
+      FVector oldLocation = GetLocation ();
+      SetLocation (oldLocation - m_speed * m_updatePeriod);
+      m_speed = -m_speed;
+      std::cout << "Collision boundary at " << Simulator::Now ().GetSeconds () << std::endl;
+      return;
+    }
   // std::cout << "Collision" << m_name << " at " << m_collision->GetGlobalLocation () << std::endl;
   Ptr<RoboAmmo> ammo = DynamicCast<RoboAmmo> (oth);
   if (ammo != 0)
@@ -257,7 +288,7 @@ RoboBase::HandleCollision (Ptr<RoboActor> oth)
           return;
         }
       // puts ("OK1");
-      std::cout << ammo->GetRange () << std::endl;
+      // std::cout << ammo->GetRange () << std::endl;
       if (ammo->GetRange () <= 0)
         {
           return;
@@ -273,6 +304,7 @@ RoboBase::HandleCollision (Ptr<RoboActor> oth)
           m_life -= ammo->GetInjury ();
           if (m_life <= 0)
             {
+              m_life = 0;
               Disable ();
             }
           std::cout << m_name << " be shot at " << Simulator::Now ().GetSeconds () << std::endl;

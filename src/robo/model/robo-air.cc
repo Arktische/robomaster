@@ -17,43 +17,44 @@
  *
  * Original Author: Pengyu Liu <eicliupengyu@gmail.com>
  */
-#include "robo-tower.h"
+#include "robo-air.h"
 namespace ns3 {
-NS_OBJECT_ENSURE_REGISTERED (RoboTower);
-NS_LOG_COMPONENT_DEFINE ("RoboTower");
-RoboTower::RoboTower ()
+NS_OBJECT_ENSURE_REGISTERED (RoboAir);
+NS_LOG_COMPONENT_DEFINE ("RoboAir");
+RoboAir::RoboAir ()
 {
 }
 
-RoboTower::~RoboTower ()
+RoboAir::~RoboAir ()
 {
 }
 TypeId
-RoboTower::GetTypeId (void)
+RoboAir::GetTypeId (void)
 {
   static TypeId tid =
-      TypeId ("ns3::RoboTower")
+      TypeId ("ns3::RoboAir")
           .SetParent<RoboBase> ()
           .SetGroupName ("Robo")
-          .AddConstructor<RoboTower> ()
+          .AddConstructor<RoboAir> ()
           .AddAttribute ("Type", "The type of this robot", EnumValue (Follower),
-                         MakeEnumAccessor (&RoboTower::m_type),
+                         MakeEnumAccessor (&RoboAir::m_type),
                          MakeEnumChecker (Master, "Master", Follower, "Follower"))
-          .AddAttribute ("Life", "The init life of this robot", IntegerValue (1000),
-                         MakeIntegerAccessor (&RoboTower::m_life), MakeIntegerChecker<int> (0))
-          .AddAttribute ("MaxSpeed", "The max speed of this robot", DoubleValue (0),
-                         MakeDoubleAccessor (&RoboTower::m_maxSpeed), MakeDoubleChecker<float> (0));
+          .AddAttribute ("Life", "The init life of this robot", IntegerValue (10000),
+                         MakeIntegerAccessor (&RoboAir::m_life), MakeIntegerChecker<int> (0))
+          .AddAttribute ("MaxSpeed", "The max speed of this robot", DoubleValue (5),
+                         MakeDoubleAccessor (&RoboAir::m_maxSpeed), MakeDoubleChecker<float> (0));
   return tid;
 }
 TypeId
-RoboTower::GetInstanceTypeId (void) const
+RoboAir::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
+
 void
-RoboTower::Init ()
+RoboAir::Init ()
 {
   m_largeAmmo->m_maxNumber = 0;
-  m_smallAmmo->m_maxNumber = 0;
 }
+
 } // namespace ns3

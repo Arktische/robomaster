@@ -18,31 +18,16 @@
  * Original Author: Pengyu Liu <eicliupengyu@gmail.com>
  */
 #pragma once
-
-// #include "ns3/robo.h"
-#include "ns3/core-module.h"
-#include "ns3/robo-actor.h"
-#include "ns3/robo-team-helper.h"
-#include "ns3/robo-judge.h"
-
+#include "robo-base.h"
 namespace ns3 {
-
-class RoboHelper
+class RoboSentry : public RoboBase
 {
-private:
-  std::vector<Ptr<RoboTeamHelper>> m_teams;
-  Ptr<RoboJudge> m_judge;
-
 public:
-  RoboHelper ();
-  ~RoboHelper ();
-
-  void AddTeam (TeamConfig config, FVector location, FAngle rotation);
-  void FinishAdd (void);
-  Ptr<RoboTeamHelper> GetTeam (uint8_t teamId);
-  NodeContainer GetAllNodes (void);
-
-  Ptr<RoboBase> GetRoboOfTeam (std::string roboName, uint8_t team);
+  RoboSentry ();
+  virtual ~RoboSentry ();
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  virtual void Init();
 };
 
 } // namespace ns3
