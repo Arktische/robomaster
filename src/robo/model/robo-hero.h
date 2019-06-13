@@ -20,13 +20,55 @@
 #pragma once
 #include "robo-base.h"
 namespace ns3 {
+  /**
+ * \brief 这个类用于描述英雄节点
+ * 
+ *
+ *   
+ * 
+ */   
 class RoboHero : public RoboBase
 {
 public:
+  /**
+ * \brief 默认构造函数
+ *  
+ *
+ * \param None 
+ * \returns RoboHero类实例
+ */
   RoboHero ();
+  /**
+ * \brief 默认虚析构函数
+ *  
+ *
+ * \param None
+ * \returns None
+ */
   virtual ~RoboHero ();
+  /**
+ * \brief 返回hero的TypeId
+ * 
+ *
+ * \param None  
+ * \returns TypeId tid
+ */
   static TypeId GetTypeId (void);
+  /**
+ * \brief 返回hero实例的TypeId
+ * 
+ *
+ * \param None  
+ * \returns TypeId tid
+ */
   virtual TypeId GetInstanceTypeId (void) const;
+  /**
+ * \brief 初始化相关操作
+ * 
+ *
+ * \param None  
+ * \returns None 
+ */
   virtual void Init();
 };
 

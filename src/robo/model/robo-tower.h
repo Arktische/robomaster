@@ -20,6 +20,13 @@
 #pragma once
 #include "robo-base.h"
 namespace ns3 {
+  /**
+ * \brief 基地类
+ *  
+ *
+ * 
+ *
+ */
 class RoboTower : public RoboBase
 {
 public:
@@ -27,6 +34,13 @@ public:
   virtual ~RoboTower ();
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
+  /**
+ * \brief 初始化
+ *  
+ *
+ * \param None 
+ * \returns None
+ */
   virtual void Init();
 };
 
